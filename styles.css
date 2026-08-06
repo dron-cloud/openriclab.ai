@@ -226,6 +226,15 @@ img { max-width: 100%; display: block; }
   font-size: 14px;
 }
 
+.portrait-photo {
+  width: 100%;
+  height: 440px;
+  min-height: 0;
+  object-fit: cover;
+  object-position: center 22%;
+  background: #eef0f3;
+}
+
 .status-card {
   position: absolute;
   left: -28px;
@@ -582,6 +591,7 @@ img { max-width: 100%; display: block; }
   .button { width: 100%; }
   .hero-visual { min-height: 410px; }
   .portrait-placeholder { min-height: 360px; }
+  .portrait-photo { height: 360px; min-height: 0; }
   .network-orbit { display: none; }
 
   .impact-grid, .card-grid, .vision-flow, .project-grid, .achievement-grid {
@@ -604,4 +614,815 @@ img { max-width: 100%; display: block; }
   .contact-actions { width: 100%; flex-direction: column; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-links { flex-wrap: wrap; }
+}
+
+
+/* NSF-funded project */
+.funded-projects {
+  background:
+    radial-gradient(circle at 8% 12%, rgba(0, 88, 168, .08), transparent 25%),
+    linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.nsf-award-card {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  overflow: hidden;
+  border: 1px solid #dbe5ef;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(14, 23, 38, .10);
+}
+
+.nsf-logo-panel {
+  min-height: 100%;
+  padding: 42px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,.16), transparent 42%),
+    linear-gradient(160deg, #034f91, #062b50);
+}
+
+.nsf-logo-panel a {
+  display: block;
+  width: min(170px, 100%);
+}
+
+.nsf-logo {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,.18));
+}
+
+.funding-label {
+  display: inline-flex;
+  padding: 8px 13px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(255,255,255,.10);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.nsf-award-content {
+  padding: 42px;
+}
+
+.award-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  color: #45627d;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.role-badge {
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--red);
+  letter-spacing: .04em;
+}
+
+.nsf-award-content h3 {
+  max-width: 850px;
+  margin: 20px 0 16px;
+  color: var(--navy);
+  font-size: clamp(30px, 3.5vw, 48px);
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+
+.award-summary {
+  max-width: 900px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.award-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin: 30px 0;
+}
+
+.award-meta div {
+  min-height: 105px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fafcfe;
+}
+
+.award-meta span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.award-meta strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.award-focus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.award-focus span {
+  padding: 8px 11px;
+  border: 1px solid #cfdeeb;
+  border-radius: 999px;
+  color: #174f7c;
+  background: #eef7ff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.award-actions {
+  margin-top: 28px;
+}
+
+.nsf-acknowledgment {
+  margin: 24px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  color: #7a8795;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
+  .nsf-award-card {
+    grid-template-columns: 1fr;
+  }
+
+  .nsf-logo-panel {
+    min-height: 250px;
+  }
+
+  .award-meta {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .nsf-award-content {
+    padding: 28px 22px;
+  }
+
+  .award-topline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .award-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .award-meta div {
+    min-height: auto;
+  }
+
+  .nsf-logo-panel {
+    min-height: 220px;
+    padding: 34px 24px;
+  }
+}
+
+
+/* SpaceNet LEO satellite network demo */
+.leo-demo-section {
+  background:
+    radial-gradient(circle at 88% 16%, rgba(200, 16, 46, .09), transparent 28%),
+    radial-gradient(circle at 10% 88%, rgba(13, 74, 126, .10), transparent 26%),
+    #f7f9fc;
+}
+
+.leo-demo-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid #dde3eb;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 24px 65px rgba(14, 23, 38, .11);
+}
+
+.leo-video-wrap {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at center, rgba(61, 111, 157, .20), transparent 45%),
+    linear-gradient(145deg, #07131f, #102b44);
+}
+
+.leo-demo-video {
+  width: 100%;
+  max-height: 620px;
+  border-radius: 18px;
+  background: #000;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, .28);
+}
+
+.leo-demo-content {
+  padding: 40px;
+}
+
+.demo-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #45627d;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.demo-badge {
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--red);
+  letter-spacing: .04em;
+}
+
+.leo-demo-content h3 {
+  margin: 20px 0 16px;
+  color: var(--navy);
+  font-size: clamp(30px, 3.2vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+
+.leo-demo-content > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.demo-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.demo-metrics div {
+  min-height: 112px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fafbfd;
+}
+
+.demo-metrics strong {
+  display: block;
+  color: var(--red);
+  font-size: 27px;
+  letter-spacing: -.04em;
+}
+
+.demo-metrics span {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.demo-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demo-features span {
+  padding: 8px 11px;
+  border: 1px solid #ccdce9;
+  border-radius: 999px;
+  color: #174f7c;
+  background: #edf7ff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+@media (max-width: 1080px) {
+  .leo-demo-card {
+    grid-template-columns: 1fr;
+  }
+
+  .leo-video-wrap {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 680px) {
+  .leo-video-wrap {
+    padding: 12px;
+  }
+
+  .leo-demo-content {
+    padding: 28px 22px;
+  }
+
+  .demo-topline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .demo-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .demo-metrics div {
+    min-height: auto;
+  }
+
+  .demo-actions {
+    flex-direction: column;
+  }
+}
+
+
+/* Focused research project refinements */
+.project-card.large {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(200,16,46,.18), transparent 24%),
+    linear-gradient(145deg, #101827, #253247);
+}
+
+.project-card.large ul {
+  margin: 18px 0 0;
+}
+
+.project-card.large li + li {
+  margin-top: 8px;
+}
+
+
+/* GLOBECOM publication and news */
+.latest-news {
+  padding: 34px 0;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 88% 20%, rgba(200, 16, 46, .08), transparent 24%),
+    linear-gradient(180deg, #fff 0%, #fbfcfe 100%);
+}
+
+.news-card {
+  display: grid;
+  grid-template-columns: 130px 1fr auto;
+  gap: 30px;
+  align-items: center;
+  padding: 30px;
+  border: 1px solid #dfe5ec;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 16px 45px rgba(14, 23, 38, .07);
+}
+
+.news-date {
+  min-height: 118px;
+  padding: 18px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #fff;
+  background:
+    radial-gradient(circle at 80% 15%, rgba(255,255,255,.16), transparent 28%),
+    linear-gradient(145deg, var(--red), var(--red-dark));
+}
+
+.news-date span {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+
+.news-date strong {
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.news-topline {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #536579;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.accepted-badge,
+.inline-accepted {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #0c6b3d;
+  background: #e9f8ef;
+  border: 1px solid #bfe8cf;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.news-content h2 {
+  margin: 10px 0 10px;
+  color: var(--navy);
+  font-size: clamp(24px, 2.5vw, 36px);
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+
+.news-content p {
+  max-width: 850px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.news-tags,
+.pub-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.news-tags span,
+.pub-tags span {
+  padding: 6px 9px;
+  border: 1px solid #cfdeeb;
+  border-radius: 999px;
+  color: #174f7c;
+  background: #eef7ff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.news-link {
+  white-space: nowrap;
+  font-weight: 800;
+  color: var(--red);
+}
+
+.featured-publication {
+  margin: 14px 0;
+  padding: 28px 22px;
+  border: 1px solid rgba(200,16,46,.20);
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff8f9, #ffffff);
+}
+
+.featured-publication .pub-venue {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.featured-publication h3 a:hover {
+  color: var(--red);
+}
+
+@media (max-width: 980px) {
+  .news-card {
+    grid-template-columns: 110px 1fr;
+  }
+
+  .news-link {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 680px) {
+  .latest-news {
+    padding: 24px 0;
+  }
+
+  .news-card {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 22px;
+  }
+
+  .news-date {
+    min-height: 95px;
+  }
+
+  .news-link {
+    grid-column: 1;
+  }
+
+  .featured-publication {
+    padding: 22px 16px;
+  }
+}
+
+
+/* Publication overlap and layout corrections */
+.publication-list {
+  display: block;
+  overflow: visible;
+}
+
+.publication {
+  position: relative;
+  grid-template-columns: 76px minmax(0, 1fr) 34px;
+  align-items: start;
+  width: 100%;
+  margin: 0;
+  overflow: visible;
+}
+
+.publication + .publication {
+  margin-top: 0;
+}
+
+.pub-body {
+  min-width: 0;
+}
+
+.pub-venue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.45;
+}
+
+.publication h3 {
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.35;
+}
+
+.publication h3 a {
+  display: inline;
+}
+
+.pub-authors {
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+
+.publication-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  min-height: 34px;
+  margin-top: 2px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.publication-link:hover {
+  background: var(--surface);
+  color: var(--red);
+}
+
+.featured-publication {
+  margin: 14px 0;
+  padding: 28px 22px;
+  border-bottom: 1px solid rgba(200,16,46,.20);
+}
+
+@media (max-width: 680px) {
+  .publication {
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .publication-link {
+    display: none;
+  }
+
+  .featured-publication {
+    padding: 22px 14px;
+  }
+
+  .publication h3 {
+    font-size: 18px;
+  }
+}
+
+
+/* Expanded publication styling */
+.inline-award {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #7a4b00;
+  background: #fff5d8;
+  border: 1px solid #efd38b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.publication-link-disabled {
+  opacity: .28;
+  pointer-events: none;
+}
+
+.pub-tags {
+  margin-top: 12px;
+}
+
+.pub-tags span {
+  line-height: 1.25;
+}
+
+@media (max-width: 680px) {
+  .pub-venue {
+    font-size: 10px;
+  }
+
+  .pub-tags {
+    gap: 6px;
+  }
+
+  .pub-tags span {
+    font-size: 10px;
+  }
+}
+
+
+/* =========================================================
+   Final faculty-website refinements
+   ========================================================= */
+
+/* Keep the four research-impact metrics visually balanced. */
+.impact-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.impact-grid div {
+  min-width: 0;
+}
+
+/* Prevent an increasingly long navigation bar from crowding. */
+.site-nav {
+  gap: clamp(14px, 1.6vw, 26px);
+}
+
+.site-nav a {
+  white-space: nowrap;
+}
+
+/* Improve keyboard accessibility. */
+a:focus-visible,
+button:focus-visible,
+video:focus-visible {
+  outline: 3px solid rgba(200, 16, 46, .35);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* More stable project-card alignment. */
+.project-card h3 {
+  margin-top: auto;
+}
+
+.project-card.large h3 {
+  margin-top: auto;
+}
+
+/* Publication list stability for long titles, venues, and authors. */
+.publication-list {
+  width: 100%;
+  overflow: visible;
+}
+
+.publication {
+  grid-template-columns: 76px minmax(0, 1fr) 36px;
+  align-items: start;
+}
+
+.pub-body {
+  min-width: 0;
+}
+
+.pub-venue,
+.publication h3,
+.pub-authors {
+  overflow-wrap: anywhere;
+}
+
+.publication h3 {
+  line-height: 1.35;
+}
+
+.publication-link {
+  align-self: start;
+}
+
+/* Make disabled publication links visually unobtrusive. */
+.publication-link-disabled {
+  visibility: hidden;
+}
+
+/* Ensure the NSF logo does not become oversized if the remote image changes. */
+.nsf-logo {
+  max-width: 170px;
+  margin-inline: auto;
+}
+
+/* Improve paragraph readability. */
+.hero-text,
+.section-heading p,
+.award-summary,
+.news-content p,
+.leo-demo-content > p,
+.about-copy p {
+  text-wrap: pretty;
+}
+
+/* Avoid large isolated words in headings. */
+.hero h1,
+.section-heading h2,
+.news-content h2,
+.nsf-award-content h3,
+.leo-demo-content h3 {
+  text-wrap: balance;
+}
+
+@media (max-width: 1120px) {
+  .site-nav {
+    gap: 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 980px) {
+  .impact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-nav {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 680px) {
+  .impact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: clamp(42px, 12vw, 54px);
+  }
+
+  .publication {
+    grid-template-columns: 54px minmax(0, 1fr);
+  }
+
+  .pub-year {
+    font-size: 13px;
+  }
 }
