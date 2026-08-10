@@ -1,0 +1,16 @@
+# Source Generated with Decompyle++
+# File: app.cpython-313.pyc (Python 3.13)
+
+__doc__ = "WirelessAI Copilot backend for Dara Ron's GitHub Pages website.\n\nThe public browser NEVER receives OLLAMA_API_KEY. This service proxies chat\nrequests to Ollama Cloud using the same API pattern as the user's forecasting\ncode: https://ollama.com/api/chat + Bearer authentication.\n"
+from __future__ import annotations
+import os
+from typing import Literal
+import httpx
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+OLLAMA_API_BASE = None('OLLAMA_API_BASE', 'https://ollama.com/api').rstrip('/')
+OLLAMA_MODEL = None('OLLAMA_MODEL', 'gpt-oss:20b').strip()
+OLLAMA_API_KEY = None('OLLAMA_API_KEY', '').strip()
+REQUEST_TIMEOUT_SECONDS = os.getenv(None('REQUEST_TIMEOUT_SECONDS', '180'))
+# WARNING: Decompyle incomplete
