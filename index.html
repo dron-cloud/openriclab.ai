@@ -1,408 +1,699 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="Dr. Dara Ron conducts research in Open RAN, AI-RAN, O-RAN security, wireless AI, and LEO/NTN space networks at NC State University." name="description"/>
-<title>Dr. Dara Ron | AI for Next-Generation Radio Access Networks</title>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="styles.css" rel="stylesheet"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dr. Dara Ron — AI-native wireless and space networking research spanning Open RAN, AI-RAN, trustworthy wireless intelligence, and LEO/NTN systems." />
+  <meta name="theme-color" content="#CC0000" />
+  <title>Dr. Dara Ron | AI-Native Wireless & Space Networks</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<header class="site-header">
-<div class="container nav-wrap">
-<a aria-label="Dara Ron homepage" class="brand" href="#home">
-<span class="brand-mark">DR</span>
-<span>Dr. Dara Ron</span>
-</a>
-<button aria-expanded="false" aria-label="Open navigation" class="nav-toggle">
-<span></span><span></span><span></span>
-</button>
-<nav class="site-nav">
-<a href="#news">News</a><a href="#vision">Vision</a>
-<a href="#expertise">Expertise</a>
-<a href="#projects">Research</a>
-<a href="#leo-demo">LEO Demo</a><a href="#funded-projects">Funded Research</a><a href="#achievements">Impact</a>
-<a href="#publications">Publications</a>
-<a class="nav-cta" href="#contact">Contact</a>
-</nav>
-</div>
-</header>
-<main>
-<section class="hero" id="home">
-<div class="hero-grid container">
-<div class="hero-copy reveal">
-<div class="eyebrow">Assistant Research Professor &middot; NC State University</div>
-<h1>AI for Next-Generation Radio Access Networks.</h1>
-<p class="hero-text">I develop trustworthy AI for Open RAN and AI-RAN, while extending intelligent networking across terrestrial, aerial, and LEO satellite systems.</p>
-<div class="hero-actions">
-<a class="button primary" href="#projects">Explore Research</a>
-<a class="button secondary" href="#publications">View Publications</a>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
-</div>
-<div aria-label="Research topics" class="hero-tags"><span>Open RAN</span><span>AI-RAN</span><span>O-RAN Security</span><span>6G</span><span>LEO &amp; NTN</span></div>
-</div>
-<div class="hero-visual reveal">
-<div class="portrait-card">
-<img alt="Portrait of Dr. Dara Ron" class="portrait-placeholder portrait-photo" decoding="async" height="750" loading="eager" src="dara-ron.jpg" width="750"/>
-<div class="status-card"><span class="pulse"></span> Advancing intelligent Open RAN and 6G</div>
-</div>
-<div class="network-orbit orbit-one"></div>
-<div class="network-orbit orbit-two"></div>
-<div class="node node-a"></div>
-<div class="node node-b"></div>
-<div class="node node-c"></div>
-</div>
-</div>
-</section>
-<section aria-label="Research impact" class="impact-strip">
-<div class="container impact-grid"><div><strong>25+</strong><span>Peer-Reviewed Publications</span></div><div><strong>15+</strong><span>IEEE Journal Articles</span></div><div><strong>115</strong><span>Operational 5G Cells Studied</span></div><div><strong>NSF</strong><span>Senior Personnel</span></div></div>
-</section>
-<section class="latest-news" id="news">
-<div class="container">
-<article class="news-card reveal">
-<div class="news-date">
-<span>2026</span>
-<strong>New Publication</strong>
-</div>
-<div class="news-content">
-<div class="news-topline">
-<span class="accepted-badge">Accepted</span>
-<span>IEEE GLOBECOM 2026</span>
-</div>
-<h2>TelcoAgent: A Scalable 5G Multi-KPM Forecasting With 3GPP-Grounded Explainability</h2>
-<p>
-          Our recent work introduces a foundation-model-based framework for scalable,
-          zero-shot forecasting of multiple 5G KPMs, together with 3GPP-grounded
-          reasoning and actionable network explanations.
-        </p>
-<div aria-label="Paper topics" class="news-tags">
-<span>AI-RAN</span>
-<span>5G KPM Forecasting</span>
-<span>Foundation Models</span>
-<span>3GPP Knowledge Graph</span>
-<span>Explainable AI</span>
-</div>
-</div>
-<a aria-label="Read TelcoAgent on arXiv" class="news-link" href="https://arxiv.org/abs/2606.19821" rel="noopener noreferrer" target="_blank">
-        Read on arXiv <span aria-hidden="true">&nearrow;</span>
-</a>
-</article>
-</div>
-</section>
-<section class="section" id="vision">
-<div class="container">
-<div class="section-heading reveal">
-<span class="section-kicker">Research Vision</span>
-<h2>From network observation to trustworthy autonomous control.</h2>
-<p>My research connects operational wireless data, programmable Open RAN platforms, AI models, and realistic network emulators to enable explainable and reliable control.</p>
-</div>
-<div class="vision-flow reveal">
-<div class="flow-card">
-<span class="flow-number">01</span>
-<h3>Observe</h3>
-<p>Collect RAN KPMs, radio measurements, topology, traffic, and compute states.</p>
-</div>
-<div class="flow-arrow">&rarr;</div>
-<div class="flow-card">
-<span class="flow-number">02</span>
-<h3>Learn</h3>
-<p>Forecast network behavior, detect anomalies, and infer system conditions using AI.</p>
-</div>
-<div class="flow-arrow">&rarr;</div>
-<div class="flow-card">
-<span class="flow-number">03</span>
-<h3>Optimize</h3>
-<p>Select resource, routing, and control actions across RAN and space-network domains.</p>
-</div>
-<div class="flow-arrow">&rarr;</div>
-<div class="flow-card accent">
-<span class="flow-number">04</span>
-<h3>Control</h3>
-<p>Execute trustworthy closed-loop decisions through Open RAN and programmable networks.</p>
-</div>
-</div>
-</div>
-</section>
-<section class="section muted" id="expertise">
-<div class="container">
-<div class="section-heading reveal">
-<span class="section-kicker">Core Expertise</span>
-<h2>AI-native intelligence for terrestrial and non-terrestrial networks.</h2>
-</div>
-<div class="card-grid expertise-grid"><article class="topic-card reveal"><div class="topic-icon">OR</div><h3>Open RAN</h3><p>Near-RT RIC, non-RT RIC, xApps, rApps, E2 control, O-RU/O-DU integration, and experimental platforms.</p></article><article class="topic-card reveal"><div class="topic-icon">AI</div><h3>AI-RAN</h3><p>AI-native RAN orchestration, joint communication and AI workloads, GPU scheduling, and autonomous network control.</p></article><article class="topic-card reveal"><div class="topic-icon">SEC</div><h3>O-RAN Security</h3><p>Security and privacy testing, fronthaul protection, vulnerability analysis, and AI-assisted test generation.</p></article><article class="topic-card reveal"><div class="topic-icon">ML</div><h3>Wireless AI</h3><p>Multi-task learning, forecasting, anomaly detection, reinforcement learning, and scalable model deployment.</p></article><article class="topic-card reveal"><div class="topic-icon">LEO</div><h3>Space Networks</h3><p>LEO routing, dynamic topology design, inter-satellite links, handover, NTN, and SAGIN.</p></article><article class="topic-card reveal"><div class="topic-icon">DT</div><h3>Network Emulation</h3><p>Realistic testbeds and emulators for Open RAN and satellite networks using live measurements and TLE data.</p></article></div>
-</div>
-</section>
-<section class="section" id="projects">
-<div class="container">
-<div class="section-heading split reveal">
-<div>
-<span class="section-kicker">Featured Research</span>
-<h2>Research in Open RAN, AI-RAN, and space networks.</h2>
-</div>
-<p>Each project combines systems research, AI methods, standards, and experimental validation.</p>
-</div>
-<div class="project-grid"><article class="project-card large reveal"><div class="project-topline"><span class="project-type">Open RAN &middot; AI-RAN</span><span>01</span></div><h3>AI-Native Open RAN</h3><p>Intelligent RAN control across near-RT and non-RT timescales using operational data, multi-task learning, AI agents, and programmable Open RAN platforms.</p><ul><li>Near-RT RIC xApps and non-RT RIC rApps</li><li>AI-RAN compute and workload orchestration</li><li>O-RAN security and privacy testing</li><li>Operational KPM forecasting and diagnosis</li></ul><a href="#expertise">Explore project &nearrow;</a></article><article class="project-card reveal"><div class="project-topline"><span class="project-type">Network Intelligence</span><span>02</span></div><h3>xFusion</h3><p>A city-scale multi-task learning system for forecasting KPMs, classifying traffic, assessing network health, and detecting anomalies.</p><a href="#publications">Explore project &nearrow;</a></article><article class="project-card reveal"><div class="project-topline"><span class="project-type">AI-RAN</span><span>03</span></div><h3>GPU-Aware RAN Orchestration</h3><p>Resource admission and scheduling for AI and RAN workloads under latency, power, and service-level constraints.</p><a href="#funded-projects">Explore project &nearrow;</a></article><article class="project-card reveal"><div class="project-topline"><span class="project-type">Space Networking</span><span>04</span></div><h3>SpaceNet &amp; DoTD</h3><p>Time-dependent LEO topology design and OSPF routing using realistic Starlink TLE data to improve capacity, latency, stability, and hop count.</p><a href="#leo-demo">Explore project &nearrow;</a></article><article class="project-card reveal"><div class="project-topline"><span class="project-type">Security &middot; AI Agents</span><span>05</span></div><h3>O-RAN Security Intelligence</h3><p>AI-assisted testing for Open Fronthaul, RIC applications, shared data platforms, privacy leakage, and cross-vendor integration.</p><a href="#expertise">Explore project &nearrow;</a></article></div>
-</div>
-</section>
-<section class="section leo-demo-section" id="leo-demo">
-<div class="container">
-<div class="section-heading split reveal">
-<div>
-<span class="section-kicker">Interactive Research Demo</span>
-<h2>SpaceNet: Dynamic LEO satellite network emulation.</h2>
-</div>
-<p>
-        A realistic demonstration of time-dependent topology design and end-to-end
-        routing across a Starlink-based LEO satellite constellation.
-      </p>
-</div>
-<article class="leo-demo-card reveal">
-<div class="leo-video-wrap">
-<video aria-label="SpaceNet LEO satellite network demonstration" class="leo-demo-video" controls="" playsinline="" poster="spacenet-demo-poster.jpg" preload="metadata">
-<source src="SpaceNet_Demo_25MB.mp4" type="video/mp4"/>
-          Your browser does not support embedded MP4 video.
-        </video>
-</div>
-<div class="leo-demo-content">
-<div class="demo-topline">
-<span>LEO Networking &middot; SpaceNet</span>
-<span class="demo-badge">Research Demo</span>
-</div>
-<h3>Time-Dependent Network Topology Optimization for LEO Satellite Constellations</h3>
-<p>
-          This demonstration visualizes a realistic Starlink-based network emulator
-          and the Dynamic Time-Expanded Graph&ndash;based Optimal Topology Design (DoTD)
-          method. The system creates time-varying inter-satellite links and applies
-          OSPF routing between geographically distributed ground stations.
-        </p>
-<div aria-label="LEO demo performance highlights" class="demo-metrics">
-<div>
-<strong>907</strong>
-<span>LEO satellites evaluated</span>
-</div>
-<div>
-<strong>5 vs. 22</strong>
-<span>New York&ndash;San Francisco hops: DoTD vs. +Grid</span>
-</div>
-<div>
-<strong>70.47%</strong>
-<span>Capacity improvement over +Grid</span>
-</div>
-<div>
-<strong>96.61%</strong>
-<span>Latency reduction over +Grid</span>
-</div>
-</div>
-<div class="demo-features">
-<span>Real TLE Data</span>
-<span>Dynamic ISLs</span>
-<span>OSPF Routing</span>
-<span>Capacity Optimization</span>
-<span>Latency Reduction</span>
-<span>Link-Churn Mitigation</span>
-</div>
-<div class="demo-actions">
-<a class="button primary" href="SpaceNet_Demo_25MB.mp4" target="_blank">
-            Open Full Demo <span aria-hidden="true">&nearrow;</span>
-</a>
-<a class="button secondary" href="https://arxiv.org/pdf/2501.13280" target="_blank">
-            Read the Paper <span aria-hidden="true">&nearrow;</span>
-</a>
-</div>
-</div>
-</article>
-</div>
-</section><section class="section funded-projects" id="funded-projects">
-<div class="container">
-<div class="section-heading split reveal">
-<div>
-<span class="section-kicker">Federally Funded Research</span>
-<h2>Contributing to an NSF-funded AI-native RAN project.</h2>
-</div>
-<p>
-        Advancing trustworthy artificial intelligence for monitoring,
-        management, and autonomous control of next-generation wireless networks.
-      </p>
-</div>
-<article class="nsf-award-card reveal">
-<div class="nsf-logo-panel">
-<a aria-label="Visit the U.S. National Science Foundation website" href="https://www.nsf.gov/" rel="noopener noreferrer" target="_blank">
-<img alt="U.S. National Science Foundation logo" class="nsf-logo" decoding="async" loading="lazy" src="https://nsf-gov-resources.nsf.gov/styles/featured_content_tablet/s3/2023-10/NSF_Official_logo_Med_Res_600ppi_rectangle.png?itok=G01s-MfI"/>
-</a>
-<span class="funding-label">NSF-Funded Research</span>
-</div>
-<div class="nsf-award-content">
-<div class="award-topline">
-<span>NSF VINES &middot; Track 1</span>
-<span class="role-badge">Senior Personnel</span>
-</div>
-<h3>
-          ARMANI: AI-Native RAN Management and Intelligence for
-          Next-Generation 6G Networks
-        </h3>
-<p class="award-summary">
-          A collaborative research project developing AI-native technologies
-          for the monitoring, management, and control of future radio access
-          networks. The project explores intelligent Open RAN architectures,
-          autonomous network operation, and trustworthy AI for next-generation
-          wireless systems.
-        </p>
-<div class="award-meta">
-<div>
-<span>Sponsor</span>
-<strong>U.S. National Science Foundation</strong>
-</div>
-<div>
-<span>Award Number</span>
-<strong>2549233</strong>
-</div>
-<div>
-<span>Role</span>
-<strong>Senior Personnel</strong>
-</div>
-<div>
-<span>Institution</span>
-<strong>NC State University</strong>
-</div>
-</div>
-<div aria-label="Project research areas" class="award-focus">
-<span>AI-Native RAN</span>
-<span>Open RAN</span>
-<span>Autonomous 6G</span>
-<span>Network Intelligence</span>
-<span>Trustworthy AI</span>
-</div>
-<div class="award-actions">
-<a class="button primary" href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2549233" rel="noopener noreferrer" target="_blank">
-            View NSF Award <span aria-hidden="true">&nearrow;</span>
-</a>
-</div>
-<p class="nsf-acknowledgment">
-          This material highlights work supported by the U.S. National Science
-          Foundation under Award No. 2549233. Any opinions, findings, conclusions,
-          or recommendations expressed are those of the author and do not
-          necessarily reflect the views of the U.S. National Science Foundation.
-        </p>
-</div>
-</article>
-</div>
-</section><section class="section dark" id="achievements">
-<div class="container">
-<div class="section-heading reveal">
-<span class="section-kicker">Selected Achievements</span>
-<h2>Research translated into systems, publications, and measurable gains.</h2>
-</div>
-<div class="achievement-grid">
-<article class="achievement-card reveal">
-<strong>115</strong>
-<h3>Operational 5G cells</h3>
-<p>City-scale AI evaluation using real-world network measurements.</p>
-</article>
-<article class="achievement-card reveal">
-<strong>70.47%</strong>
-<h3>Capacity improvement</h3>
-<p>LEO topology optimization compared with the +Grid baseline.</p>
-</article>
-<article class="achievement-card reveal">
-<strong>95%+</strong>
-<h3>KPM forecasting accuracy</h3>
-<p>Multi-task forecasting across operational network indicators.</p>
-</article>
-<article class="achievement-card reveal">
-<strong>1 ms</strong>
-<h3>Positioning update</h3>
-<p>5G/O-RAN positioning with sub-meter-level experimental accuracy.</p>
-</article>
-</div>
-</div>
-</section>
-<section class="section" id="publications">
-<div class="container">
-<div class="section-heading split reveal">
-<div>
-<span class="section-kicker">Selected Publications</span>
-<h2>Selected publications in AI, wireless systems, and space networking.</h2>
-</div>
-<a class="button secondary" href="https://scholar.google.com/citations?user=Y20bNZ8AAAAJ&amp;hl=en" rel="noopener noreferrer" target="_blank">Google Scholar</a>
-</div>
-<div class="publication-list">
-<article class="publication reveal featured-publication">
-<div class="pub-year">2026</div>
-<div class="pub-body">
-<span class="pub-venue">IEEE GLOBECOM 2026<span class="inline-accepted">Accepted</span></span>
-<h3><a href="https://arxiv.org/abs/2606.19821" rel="noopener noreferrer" target="_blank">TelcoAgent: A Scalable 5G Multi-KPM Forecasting With 3GPP-Grounded Explainability</a></h3>
-<p class="pub-authors">Geon Kim, <strong>Dara Ron</strong>, Sukhdeep Singh, Suyog Moogi, Pranshav Gajjar, V. V. N. K. S. R. Koduri, Een Kee Hong, and Vijay K. Shah</p>
-<div class="pub-tags"><span>AI-RAN</span><span>TSFM</span><span>3GPP</span><span>Knowledge Graph</span><span>Explainability</span></div></div><a aria-label="Open TelcoAgent: A Scalable 5G Multi-KPM Forecasting With 3GPP-Grounded Explainability" class="publication-link" href="https://arxiv.org/abs/2606.19821" rel="noopener noreferrer" target="_blank">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2026</div><div class="pub-body"><span class="pub-venue">IEEE Transactions on Instrumentation and Measurement, Vol. 75, pp. 1&ndash;14</span><h3><a href="https://ieeexplore.ieee.org/abstract/document/11479368" rel="noopener noreferrer" target="_blank">Deep Reinforcement Learning-Based Active Sensing on a Bicycle for Vehicle Tracking</a></h3><p class="pub-authors">Woongsun Jeon, <strong>Dara Ron</strong>, and Jung-Ryun Lee</p><div class="pub-tags"><span>Deep Reinforcement Learning</span><span>Active Sensing</span><span>Vehicle Tracking</span></div></div><a aria-label="Open Deep Reinforcement Learning-Based Active Sensing on a Bicycle for Vehicle Tracking" class="publication-link" href="https://ieeexplore.ieee.org/abstract/document/11479368" rel="noopener noreferrer" target="_blank">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2026</div><div class="pub-body"><span class="pub-venue">IEEE Transactions on Vehicular Technology</span><h3>O-NIIS: Open and Intelligent IRS-SWIPT for Wireless Energy-Efficiency Enhancement</h3><p class="pub-authors"><strong>Dara Ron</strong> et al.</p><div class="pub-tags"><span>IRS</span><span>SWIPT</span><span>Energy Efficiency</span></div></div><a aria-disabled="true" aria-label="Open O-NIIS: Open and Intelligent IRS-SWIPT for Wireless Energy-Efficiency Enhancement" class="publication-link publication-link-disabled" href="#">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2025</div><div class="pub-body"><span class="pub-venue">IEEE INFOCOM</span><h3><a href="https://arxiv.org/pdf/2501.13280" rel="noopener noreferrer" target="_blank">Time-Dependent Network Topology Optimization for LEO Satellite Constellations</a></h3><p class="pub-authors"><strong>Dara Ron</strong> et al.</p><div class="pub-tags"><span>LEO Networks</span><span>Topology Optimization</span><span>OSPF</span></div></div><a aria-label="Open Time-Dependent Network Topology Optimization for LEO Satellite Constellations" class="publication-link" href="https://arxiv.org/pdf/2501.13280" rel="noopener noreferrer" target="_blank">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2024</div><div class="pub-body"><span class="pub-venue">ACM WiseML 2024<span class="inline-award">Best Paper Award</span></span><h3>Wireless-Powered Multi-Channel Backscatter Communications Under Jamming: A Cooperative Reinforcement Learning Approach</h3><p class="pub-authors"><strong>Dara Ron</strong> and Kai Zeng</p><div class="pub-tags"><span>Backscatter</span><span>Anti-Jamming</span><span>Cooperative Reinforcement Learning</span></div></div><a aria-disabled="true" aria-label="Open Wireless-Powered Multi-Channel Backscatter Communications Under Jamming: A Cooperative Reinforcement Learning Approach" class="publication-link publication-link-disabled" href="#">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2025</div><div class="pub-body"><span class="pub-venue">IEEE MILCOM 2025 Demonstration</span><h3>Jamming Smarter, Not Harder: Exploiting O-RAN Y1 RAN Analytics for Efficient Interference</h3><p class="pub-authors">A Ganiyu, <strong>Dara Ron</strong> et al.</p><div class="pub-tags"><span>O-RAN Security</span><span>Jamming Detection</span><span>Testbed</span></div></div><a aria-disabled="true" aria-label="Open AI-Enabled Jamming Detection and Mitigation in an O-RAN Testbed" class="publication-link publication-link-disabled" href="#">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2024</div><div class="pub-body"><span class="pub-venue">ACM WiNTECH</span><h3>Experimental Validation of a 3GPP compliant 5G-based Positioning System</h3><p class="pub-authors">S Dhungel, G Duggal, <strong>Dara Ron</strong> et al.</p><div class="pub-tags"><span>Open RAN</span><span>Positioning</span><span>Radio Measurements</span></div></div><a aria-disabled="true" aria-label="Open O-RAN-Assisted High-Accuracy Positioning Using Radio Measurements" class="publication-link publication-link-disabled" href="#">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2025</div><div class="pub-body"><span class="pub-venue">IEEE Transactions on Green Communications and Networking</span><h3>Intelligent Energy Efficiency and Service Reliability Optimization for UAV-Aided Terrestrial Networks</h3><p class="pub-authors"><strong>Dara Ron</strong> and Jung-Ryun Lee</p><div class="pub-tags"><span>UAV Networks</span><span>Energy Efficiency</span><span>Service Reliability</span></div></div><a aria-disabled="true" aria-label="Open Intelligent Energy Efficiency and Service Reliability Optimization for UAV-Aided Terrestrial Networks" class="publication-link publication-link-disabled" href="#">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2022</div><div class="pub-body"><span class="pub-venue">IEEE Transactions on Vehicular Technology, pp. 1&ndash;7</span><h3>DNN-Based Dynamic Transmit Power Control for V2V Communication Underlaid Cellular Uplink</h3><p class="pub-authors"><strong>Dara Ron</strong> and Jung-Ryun Lee</p><div class="pub-tags"><span>V2V</span><span>DNN</span><span>Power Control</span></div></div><a aria-disabled="true" aria-label="Open DNN-Based Dynamic Transmit Power Control for V2V Communication Underlaid Cellular Uplink" class="publication-link publication-link-disabled" href="#">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2021</div><div class="pub-body"><span class="pub-venue">IEEE Transactions on Vehicular Technology, Vol. 70, No. 10, pp. 11121&ndash;11126</span><h3>DRL-Based Sum-Rate Maximization in D2D Communication Underlaid Uplink Cellular Networks</h3><p class="pub-authors"><strong>Dara Ron</strong> and Jung-Ryun Lee</p><div class="pub-tags"><span>D2D</span><span>Deep Reinforcement Learning</span><span>Sum-Rate Optimization</span></div></div><a aria-disabled="true" aria-label="Open DRL-Based Sum-Rate Maximization in D2D Communication Underlaid Uplink Cellular Networks" class="publication-link publication-link-disabled" href="#">&nearrow;</a></article><article class="publication reveal"><div class="pub-year">2020</div><div class="pub-body"><span class="pub-venue">IEEE Internet of Things Journal, Vol. 7, No. 8, pp. 7836&ndash;7847</span><h3>Performance Analysis and Optimization of Downlink Transmission in LoRaWAN Class B Mode</h3><p class="pub-authors"><strong>Dara Ron</strong>, C. J. Lee, K. Lee, H. H. Choi, and Jung-Ryun Lee</p><div class="pub-tags"><span>LoRaWAN</span><span>IoT</span><span>Performance Optimization</span></div></div><a aria-disabled="true" aria-label="Open Performance Analysis and Optimization of Downlink Transmission in LoRaWAN Class B Mode" class="publication-link publication-link-disabled" href="#">&nearrow;</a></article></div>
-</div>
-</section>
-<section class="section muted">
-<div class="container about-grid">
-<div class="about-copy reveal">
-<span class="section-kicker">About</span>
-<h2>AI for next-generation RAN and space networks.</h2>
-<p>Dr. Dara Ron is an Assistant Research Professor in Electrical and Computer Engineering at NC State University. His research focuses on Open RAN, AI-RAN, O-RAN security, wireless AI, and LEO/NTN space networks.</p>
-<p>His work integrates algorithm design, operational network data, programmable testbeds, standards-grounded intelligence, and experimental validation.</p>
-</div>
-<div class="about-panel reveal">
-<div>
-<span>Current Role</span>
-<strong>Assistant Research Professor</strong>
-</div>
-<div>
-<span>Institution</span>
-<strong>NC State University</strong>
-</div>
-<div>
-<span>Department</span>
-<strong>Electrical &amp; Computer Engineering</strong>
-</div>
-<div>
-<span>Location</span>
-<strong>Raleigh, North Carolina, USA</strong>
-</div>
-</div>
-</div>
-</section>
-<section class="contact-section" id="contact">
-<div class="container contact-card reveal">
-<div>
-<span class="section-kicker">Collaboration</span>
-<h2>Let&rsquo;s build the next generation of intelligent wireless systems.</h2>
-<p>
-            I welcome research collaborations, student inquiries, industry partnerships,
-            invited talks, and joint proposal opportunities.
+  <header class="site-header" id="top">
+    <div class="container nav-shell">
+      <a class="brand" href="#home" aria-label="Dr. Dara Ron homepage">
+        <span class="brand-mark" aria-hidden="true">DR</span>
+        <span class="brand-copy">
+          <strong>Dr. Dara Ron</strong>
+          <small>NC State University</small>
+        </span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
+        <a href="#research">Research</a>
+        <a href="#systems">Systems</a>
+        <a href="#impact">Impact</a>
+        <a href="#funding">Funding</a>
+        <a href="#publications">Publications</a>
+        <a href="#about">About</a>
+        <a class="nav-cta" href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- HERO -->
+    <section class="hero" id="home">
+      <div class="hero-grid-bg" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
+
+      <div class="container hero-layout">
+        <div class="hero-copy reveal">
+          <div class="eyebrow">Assistant Research Professor · Electrical &amp; Computer Engineering · NC State</div>
+          <h1>AI-Native Wireless<br />and Space Networks.</h1>
+          <p class="hero-lead">
+            I develop <strong>intelligent, autonomous, and trustworthy networked systems</strong>
+            spanning Open RAN, AI-RAN, and non-terrestrial networks—connecting AI algorithms
+            with programmable infrastructure, operational data, and experimental validation.
           </p>
-</div>
-<div class="contact-actions">
-<a class="button light" href="mailto:dron@ncsu.edu">Email Me</a>
-<a class="button outline-light" href="https://scholar.google.com/citations?user=Y20bNZ8AAAAJ&amp;hl=en" rel="noopener noreferrer" target="_blank">Google Scholar</a>
-</div>
-</div>
-</section>
-</main>
-<footer class="site-footer">
-<div class="container footer-grid">
-<div>
-<a class="brand footer-brand" href="#home">
-<span class="brand-mark">DR</span>
-<span>Dr. Dara Ron</span>
-</a>
-<p>Open RAN &middot; AI-RAN &middot; O-RAN Security &middot; Wireless AI &middot; Space Networks</p>
-</div>
-<div class="footer-links">
-<a href="#vision">Vision</a>
-<a href="#projects">Projects</a>
-<a href="#publications">Publications</a>
-<a href="#contact">Contact</a>
-</div>
-<p class="copyright">&copy; <span id="year"></span> Dara Ron. All rights reserved.</p>
-</div>
-</footer>
-<script src="script.js"></script>
+
+          <div class="hero-actions">
+            <a class="button primary" href="#research">Explore Research</a>
+            <a class="button secondary" href="#publications">Selected Publications</a>
+            <a class="text-link" href="https://scholar.google.com/citations?user=Y20bNZ8AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">Google Scholar <span aria-hidden="true">↗</span></a>
+          </div>
+
+          <div class="research-signature" aria-label="Primary research areas">
+            <span>Open RAN &amp; AI-RAN</span>
+            <span>Trustworthy Wireless AI</span>
+            <span>LEO &amp; NTN</span>
+          </div>
+        </div>
+
+        <div class="hero-profile reveal">
+          <div class="portrait-frame">
+            <img src="dara-ron.jpg" alt="Portrait of Dr. Dara Ron" class="portrait-photo" width="760" height="880" loading="eager" decoding="async" />
+            <div class="portrait-overlay"></div>
+            <div class="portrait-caption">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span>Researching autonomous 6G infrastructure</span>
+            </div>
+          </div>
+
+          <div class="hero-metric metric-a">
+            <strong>115</strong>
+            <span>Operational 5G cells</span>
+          </div>
+          <div class="hero-metric metric-b">
+            <strong>NSF</strong>
+            <span>Funded AI-RAN research</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="container evidence-strip reveal" aria-label="Research evidence">
+        <div class="evidence-item">
+          <strong>115</strong>
+          <span>Operational 5G cells studied</span>
+        </div>
+        <div class="evidence-item">
+          <strong>IEEE INFOCOM</strong>
+          <span>LEO network topology research</span>
+        </div>
+        <div class="evidence-item">
+          <strong>NSF VINES</strong>
+          <span>Senior Personnel · AI-native RAN</span>
+        </div>
+        <div class="evidence-item">
+          <strong>25+</strong>
+          <span>Peer-reviewed publications</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESEARCH IDENTITY -->
+    <section class="section section-light" id="research">
+      <div class="container">
+        <div class="section-heading heading-wide reveal">
+          <div>
+            <span class="section-kicker">Research Portfolio</span>
+            <h2>One research agenda. Three connected pillars.</h2>
+          </div>
+          <p>
+            My research moves from <strong>network intelligence</strong> to <strong>autonomous control</strong>:
+            observe operational systems, forecast behavior, reason about communication and compute resources,
+            optimize decisions, execute them through programmable networks, and verify performance and trustworthiness.
+          </p>
+        </div>
+
+        <div class="pillar-grid">
+          <article class="pillar-card pillar-blue reveal">
+            <div class="pillar-topline">
+              <span class="pillar-number">01</span>
+              <span class="pillar-domain">Core Research</span>
+            </div>
+            <div class="pillar-icon" aria-hidden="true">AI</div>
+            <h3>AI-Native Open RAN &amp; AI-RAN</h3>
+            <p class="pillar-goal">
+              Build autonomous RAN systems that jointly reason about radio resources, computing infrastructure,
+              AI workloads, and service requirements.
+            </p>
+            <ul class="clean-list">
+              <li>Operational KPM forecasting, diagnosis, and anomaly detection</li>
+              <li>Near-RT RIC xApps, non-RT RIC rApps, and AI agents</li>
+              <li>GPU/CPU/NPU-aware AI and RAN workload orchestration</li>
+              <li>Closed-loop network control under latency and SLA constraints</li>
+            </ul>
+            <div class="pillar-tags">
+              <span>Open RAN</span><span>AI-RAN</span><span>RIC</span><span>Multi-Task AI</span>
+            </div>
+          </article>
+
+          <article class="pillar-card pillar-violet reveal">
+            <div class="pillar-topline">
+              <span class="pillar-number">02</span>
+              <span class="pillar-domain">Trust &amp; Security</span>
+            </div>
+            <div class="pillar-icon" aria-hidden="true">SEC</div>
+            <h3>Trustworthy &amp; Secure Wireless Intelligence</h3>
+            <p class="pillar-goal">
+              Make disaggregated and AI-native wireless systems secure, privacy-aware, explainable,
+              and experimentally verifiable.
+            </p>
+            <ul class="clean-list">
+              <li>Open Fronthaul and cross-vendor O-RU/O-DU security testing</li>
+              <li>Privacy leakage and shared-data risk analysis across RIC applications</li>
+              <li>LLM/agent-assisted vulnerability analysis and test generation</li>
+              <li>Jamming, interference, and adversarial wireless intelligence</li>
+            </ul>
+            <div class="pillar-tags">
+              <span>O-RAN Security</span><span>Privacy</span><span>LLM Agents</span><span>Jamming</span>
+            </div>
+          </article>
+
+          <article class="pillar-card pillar-cyan reveal">
+            <div class="pillar-topline">
+              <span class="pillar-number">03</span>
+              <span class="pillar-domain">Non-Terrestrial</span>
+            </div>
+            <div class="pillar-icon" aria-hidden="true">LEO</div>
+            <h3>Space &amp; Non-Terrestrial Networks</h3>
+            <p class="pillar-goal">
+              Develop intelligent networking architectures for highly dynamic LEO, NTN, aerial,
+              and space–air–ground communication systems.
+            </p>
+            <ul class="clean-list">
+              <li>LEO topology optimization, routing, and inter-satellite links</li>
+              <li>NTN mobility, handover, and transport-aware network selection</li>
+              <li>Direct-to-device and multi-layer space–air–ground connectivity</li>
+              <li>Standards-grounded space-network digital twins and emulation</li>
+            </ul>
+            <div class="pillar-tags">
+              <span>LEO</span><span>NTN</span><span>SAGIN</span><span>Digital Twins</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESEARCH METHOD / AGENDA -->
+    <section class="section research-loop-section">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="section-kicker section-kicker-light">Research Approach</span>
+          <h2>Algorithms → Systems → Experimental Validation.</h2>
+          <p>
+            I combine AI and optimization with standards-grounded system design and experimental validation
+            using operational networks, programmable Open RAN platforms, and realistic space-network emulators.
+          </p>
+        </div>
+
+        <div class="research-loop reveal" aria-label="Research workflow">
+          <div class="loop-step"><span>01</span><strong>Observe</strong><small>KPMs · radio · traffic · topology · compute</small></div>
+          <div class="loop-arrow" aria-hidden="true">→</div>
+          <div class="loop-step"><span>02</span><strong>Predict</strong><small>Forecast workloads, mobility, and network state</small></div>
+          <div class="loop-arrow" aria-hidden="true">→</div>
+          <div class="loop-step"><span>03</span><strong>Reason</strong><small>Combine learned models with standards and domain knowledge</small></div>
+          <div class="loop-arrow" aria-hidden="true">→</div>
+          <div class="loop-step"><span>04</span><strong>Optimize</strong><small>Joint communication, compute, routing, and control</small></div>
+          <div class="loop-arrow" aria-hidden="true">→</div>
+          <div class="loop-step"><span>05</span><strong>Act</strong><small>Execute safe closed-loop control through programmable networks</small></div>
+          <div class="loop-arrow" aria-hidden="true">→</div>
+          <div class="loop-step"><span>06</span><strong>Verify</strong><small>Measure reliability, security, performance, and robustness</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURED SYSTEMS -->
+    <section class="section section-light" id="systems">
+      <div class="container">
+        <div class="section-heading heading-wide reveal">
+          <div>
+            <span class="section-kicker">Featured Systems</span>
+            <h2>Research translated into working networked systems.</h2>
+          </div>
+          <p>
+            Each project is presented around the research problem, my contribution, experimental evidence,
+            and the system or publication output—so the technical trajectory is immediately visible.
+          </p>
+        </div>
+
+        <div class="featured-grid">
+          <article class="featured-card featured-primary reveal">
+            <div class="featured-badge">AI-RAN · Network Intelligence</div>
+            <h3>xFusion: Scalable Multi-Task Intelligence for Operational RANs</h3>
+            <div class="project-story">
+              <div><strong>Problem</strong><p>Deploying isolated AI models for every cell, KPM, and network task creates excessive compute, memory, and lifecycle overhead.</p></div>
+              <div><strong>Contribution</strong><p>A unified multi-task xApp architecture for forecasting, traffic classification, health assessment, anomaly detection, and condition diagnosis.</p></div>
+              <div><strong>Evidence</strong><p>Evaluated across 115 operational 5G cells, including 805 KPM forecasting tasks, with near-real-time execution.</p></div>
+            </div>
+            <div class="metric-row">
+              <div><strong>115</strong><span>5G cells</span></div>
+              <div><strong>805</strong><span>forecast tasks</span></div>
+              <div><strong>&lt; 750 ms</strong><span>near-RT budget</span></div>
+            </div>
+            <div class="card-links">
+              <a href="#publications">Related Publications →</a>
+              <a href="#infrastructure">Experimental Platform →</a>
+            </div>
+          </article>
+
+          <article class="featured-card reveal">
+            <div class="featured-badge">AI-RAN · Compute Orchestration</div>
+            <h3>GPU-Aware AI &amp; RAN Workload Orchestration</h3>
+            <p>
+              Jointly coordinates communication and AI workloads across shared edge compute resources while
+              respecting latency, power, service-level, and admission constraints.
+            </p>
+            <div class="mini-flow" aria-label="AI-RAN orchestration flow">
+              <span>RAN + AI Workloads</span><i>→</i><span>Resource Intelligence</span><i>→</i><span>GPU/CPU Allocation</span><i>→</i><span>SLA-Aware Control</span>
+            </div>
+            <div class="card-links"><a href="#funding">AI-RAN Research →</a></div>
+          </article>
+
+          <article class="featured-card reveal">
+            <div class="featured-badge">Security · O-RAN</div>
+            <h3>O-RAN Security Intelligence</h3>
+            <p>
+              A systems-oriented security research program spanning Open Fronthaul protection, privacy leakage,
+              cross-vendor integration, RIC application trust, and AI-assisted vulnerability testing.
+            </p>
+            <div class="security-chain" aria-label="O-RAN security scope">
+              <span>O-RU</span><i>↔</i><span>O-DU/O-CU</span><i>↔</i><span>Near-RT RIC</span><i>↔</i><span>Non-RT RIC</span>
+            </div>
+            <div class="card-links"><a href="#publications">Security Work →</a></div>
+          </article>
+
+          <article class="featured-card space-feature reveal">
+            <div class="featured-badge">Space Networking · IEEE INFOCOM</div>
+            <h3>SpaceNet &amp; Dynamic LEO Topology Design</h3>
+            <p>
+              Time-dependent topology optimization and routing for dynamic LEO satellite networks using realistic
+              constellation data, inter-satellite links, and end-to-end network metrics.
+            </p>
+            <div class="space-metrics">
+              <div><strong>907</strong><span>LEO satellites evaluated</span></div>
+              <div><strong>70.47%</strong><span>capacity gain vs. +Grid</span></div>
+              <div><strong>5 vs. 22</strong><span>NY–SF hops</span></div>
+            </div>
+            <div class="card-links">
+              <a href="#spacenet-demo">Watch Demo →</a>
+              <a href="https://arxiv.org/abs/2501.13280" target="_blank" rel="noopener noreferrer">Read Paper ↗</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFRASTRUCTURE -->
+    <section class="section infrastructure-section" id="infrastructure">
+      <div class="container">
+        <div class="section-heading heading-wide reveal">
+          <div>
+            <span class="section-kicker section-kicker-light">Experimental Research Infrastructure</span>
+            <h2>I build and validate systems—not only models.</h2>
+          </div>
+          <p>
+            My research connects algorithms to operational data, programmable Open RAN components,
+            real-time controllers, and network emulators for reproducible systems evaluation.
+          </p>
+        </div>
+
+        <div class="infrastructure-grid">
+          <article class="infra-card reveal">
+            <span class="infra-index">01</span>
+            <h3>Operational 5G Data</h3>
+            <p>City-scale measurements across 115 operational cells for network forecasting, diagnosis, and AI evaluation.</p>
+            <div class="infra-chip">Operational KPMs</div>
+          </article>
+          <article class="infra-card reveal">
+            <span class="infra-index">02</span>
+            <h3>Open RAN Testbed</h3>
+            <p>O-RU → O-DU/O-CU → Near-RT RIC → xApps/rApps for cross-layer experimentation and control.</p>
+            <div class="infra-chip">Programmable RAN</div>
+          </article>
+          <article class="infra-card reveal">
+            <span class="infra-index">03</span>
+            <h3>AI-RAN Platform</h3>
+            <p>Shared communication and AI workloads with GPU/CPU resource monitoring, scheduling, and SLA-aware orchestration.</p>
+            <div class="infra-chip">Compute + RAN</div>
+          </article>
+          <article class="infra-card reveal">
+            <span class="infra-index">04</span>
+            <h3>Space Network Emulator</h3>
+            <p>TLE-driven constellations, dynamic ISLs, routing, propagation, and end-to-end KPM evaluation.</p>
+            <div class="infra-chip">LEO / NTN</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPACENET DEMO -->
+    <section class="section section-light" id="spacenet-demo">
+      <div class="container demo-layout">
+        <div class="demo-copy reveal">
+          <span class="section-kicker">Interactive Research Demo</span>
+          <h2>SpaceNet: Dynamic LEO network emulation.</h2>
+          <p>
+            This demonstration visualizes a realistic Starlink-based network emulator and the Dynamic
+            Time-Expanded Graph–based Optimal Topology Design (DoTD) method. The system creates time-varying
+            inter-satellite links and applies end-to-end routing between geographically distributed ground stations.
+          </p>
+          <div class="demo-facts">
+            <div><strong>Real TLE data</strong><span>Realistic orbital dynamics</span></div>
+            <div><strong>Dynamic ISLs</strong><span>Time-varying network topology</span></div>
+            <div><strong>Routing + KPMs</strong><span>Capacity, latency, hops, churn</span></div>
+          </div>
+          <a class="button primary" href="https://arxiv.org/abs/2501.13280" target="_blank" rel="noopener noreferrer">Read IEEE INFOCOM Paper ↗</a>
+        </div>
+
+        <div class="demo-media reveal">
+          <div class="video-frame">
+            <video controls preload="metadata" poster="spacenet-demo-poster.jpg" aria-label="SpaceNet LEO satellite network research demonstration">
+              <source src="SpaceNet_Demo_25MB.mp4" type="video/mp4" />
+              Your browser does not support embedded MP4 video.
+            </video>
+          </div>
+          <div class="video-caption">
+            <span>LEO Networking · SpaceNet Research Demo</span>
+            <strong>Time-Dependent Network Topology Optimization</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPACT -->
+    <section class="section impact-section" id="impact">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="section-kicker section-kicker-light">Research Impact</span>
+          <h2>Scale, systems evidence, and measurable gains.</h2>
+        </div>
+
+        <div class="impact-grid">
+          <article class="impact-card reveal"><strong>115</strong><h3>Operational 5G Cells</h3><p>City-scale AI evaluation using real-world network measurements.</p></article>
+          <article class="impact-card reveal"><strong>805</strong><h3>Forecasting Tasks</h3><p>Seven KPM forecasting tasks evaluated across 115 cells.</p></article>
+          <article class="impact-card reveal"><strong>70.47%</strong><h3>Capacity Improvement</h3><p>LEO topology optimization compared with the +Grid baseline.</p></article>
+          <article class="impact-card reveal"><strong>1 ms</strong><h3>Positioning Update</h3><p>Experimental 5G/O-RAN positioning with sub-meter-level accuracy.</p></article>
+        </div>
+
+        <div class="recognition-band reveal">
+          <div>
+            <span class="recognition-label">Recognition</span>
+            <strong>ACM WiseML 2024 Best Paper Award</strong>
+            <p>Wireless-powered multi-channel backscatter communications under jamming using cooperative reinforcement learning.</p>
+          </div>
+          <div class="recognition-mark" aria-hidden="true">★</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FUNDING -->
+    <section class="section section-light" id="funding">
+      <div class="container">
+        <div class="section-heading heading-wide reveal">
+          <div>
+            <span class="section-kicker">Research Funding &amp; Leadership</span>
+            <h2>Contributing to federally funded AI-native RAN research.</h2>
+          </div>
+          <p>
+            My current funded research contributes to autonomous monitoring, management, and control for
+            next-generation AI-native radio access networks.
+          </p>
+        </div>
+
+        <article class="funding-card reveal">
+          <div class="funding-side">
+            <div class="nsf-mark" aria-label="National Science Foundation">NSF</div>
+            <span>U.S. National Science Foundation</span>
+          </div>
+          <div class="funding-main">
+            <div class="funding-topline"><span>NSF VINES · Track 1</span><span class="role-pill">Senior Personnel</span></div>
+            <h3>ARMANI: AI-Native RAN Management and Intelligence for Next-Generation 6G Networks</h3>
+            <p>
+              A collaborative project developing AI-native technologies for monitoring, management, and control
+              of future radio access networks, including intelligent Open RAN architectures, autonomous network
+              operation, and trustworthy AI.
+            </p>
+            <div class="funding-meta">
+              <div><small>Award</small><strong>2549233</strong></div>
+              <div><small>Role</small><strong>Senior Personnel</strong></div>
+              <div><small>Institution</small><strong>NC State University</strong></div>
+            </div>
+            <a class="button secondary" href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2549233" target="_blank" rel="noopener noreferrer">View NSF Award ↗</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PUBLICATIONS -->
+    <section class="section publications-section" id="publications">
+      <div class="container">
+        <div class="section-heading heading-wide reveal">
+          <div>
+            <span class="section-kicker section-kicker-light">Selected Publications</span>
+            <h2>Selected publications by year and venue.</h2>
+            <p>Representative peer-reviewed work showing the evolution of my research across wireless AI, intelligent networking, Open RAN, and non-terrestrial networks.</p>
+          </div>
+          <a class="button outline-light" href="https://scholar.google.com/citations?user=Y20bNZ8AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">View Full Publication List ↗</a>
+        </div>
+
+        <div class="year-publications reveal">
+          <section class="year-block">
+            <div class="year-heading"><span>2026</span><small>Recent work</small></div>
+            <div class="publication-list">
+              <article class="publication-item featured-pub">
+                <div class="pub-date">2026</div>
+                <div class="pub-body">
+                  <div class="pub-meta"><span class="publisher-badge publisher-ieee">IEEE</span><span class="venue-name">GLOBECOM 2026</span><span class="pub-status">Accepted</span></div>
+                  <h4><a href="https://arxiv.org/abs/2606.19821" target="_blank" rel="noopener noreferrer">TelcoAgent: A Scalable 5G Multi-KPM Forecasting With 3GPP-Grounded Explainability ↗</a></h4>
+                  <p>G. Kim, D. Ron, S. Singh, S. Moogi, P. Gajjar, V. V. N. K. S. R. Koduri, E. K. Hong, and V. K. Shah</p>
+                  <div class="pub-tags"><span>5G KPM</span><span>Forecasting</span><span>3GPP</span><span>Explainable AI</span></div>
+                </div>
+              </article>
+
+              <article class="publication-item">
+                <div class="pub-date">2026</div>
+                <div class="pub-body">
+                  <div class="pub-meta"><span class="publisher-badge publisher-ieee">IEEE</span><span class="venue-name">Transactions on Vehicular Technology</span></div>
+                  <h4>O-NIIS: Open and Intelligent IRS-SWIPT for Wireless Energy-Efficiency Enhancement</h4>
+                  <p>D. Ron et al.</p>
+                  <div class="pub-tags"><span>IRS</span><span>SWIPT</span><span>Energy Efficiency</span><span>Wireless AI</span></div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="year-block">
+            <div class="year-heading"><span>2025</span><small>LEO networking · O-RAN security · UAV networks</small></div>
+            <div class="publication-list">
+              <article class="publication-item featured-pub">
+                <div class="pub-date">2025</div>
+                <div class="pub-body">
+                  <div class="pub-meta"><span class="publisher-badge publisher-ieee">IEEE</span><span class="venue-name">INFOCOM</span></div>
+                  <h4><a href="https://arxiv.org/abs/2501.13280" target="_blank" rel="noopener noreferrer">Time-Dependent Network Topology Optimization for LEO Satellite Constellations ↗</a></h4>
+                  <p>D. Ron et al.</p>
+                  <div class="pub-tags"><span>LEO</span><span>Topology Optimization</span><span>ISL</span><span>Routing</span></div>
+                </div>
+              </article>
+
+              <article class="publication-item">
+                <div class="pub-date">2025</div>
+                <div class="pub-body">
+                  <div class="pub-meta"><span class="publisher-badge publisher-ieee">IEEE</span><span class="venue-name">MILCOM 2025</span><span class="pub-status">Demonstration</span></div>
+                  <h4>Jamming Smarter, Not Harder: Exploiting O-RAN Y1 RAN Analytics for Efficient Interference</h4>
+                  <p>A. Ganiyu, D. Ron et al.</p>
+                  <div class="pub-tags"><span>O-RAN Security</span><span>Jamming</span><span>Testbed</span></div>
+                </div>
+              </article>
+
+              <article class="publication-item">
+                <div class="pub-date">2025</div>
+                <div class="pub-body">
+                  <div class="pub-meta"><span class="publisher-badge publisher-ieee">IEEE</span><span class="venue-name">Transactions on Green Communications and Networking</span></div>
+                  <h4>Intelligent Energy Efficiency and Service Reliability Optimization for UAV-Aided Terrestrial Networks</h4>
+                  <p>D. Ron and J.-R. Lee</p>
+                  <div class="pub-tags"><span>UAV</span><span>SAGIN</span><span>Resource Optimization</span><span>Reliability</span></div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="year-block">
+            <div class="year-heading"><span>2024</span><small>Experimental wireless systems · reinforcement learning</small></div>
+            <div class="publication-list">
+              <article class="publication-item">
+                <div class="pub-date">2024</div>
+                <div class="pub-body">
+                  <div class="pub-meta"><span class="publisher-badge publisher-acm">ACM</span><span class="venue-name">WiNTECH</span></div>
+                  <h4>Experimental Validation of a 3GPP Compliant 5G-Based Positioning System</h4>
+                  <p>S. Dhungel, G. Duggal, D. Ron et al.</p>
+                  <div class="pub-tags"><span>5G</span><span>Positioning</span><span>3GPP</span><span>Experiment</span></div>
+                </div>
+              </article>
+
+              <article class="publication-item award-pub">
+                <div class="pub-date">2024</div>
+                <div class="pub-body">
+                  <div class="pub-meta"><span class="publisher-badge publisher-acm">ACM</span><span class="venue-name">WiseML</span><span class="award-badge">Best Paper Award</span></div>
+                  <h4>Wireless-Powered Multi-Channel Backscatter Communications Under Jamming: A Cooperative Reinforcement Learning Approach</h4>
+                  <p>D. Ron and K. Zeng</p>
+                  <div class="pub-tags"><span>Backscatter</span><span>Anti-Jamming</span><span>Reinforcement Learning</span></div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="year-block">
+            <div class="year-heading"><span>2022–2021</span><small>Foundational AI for wireless resource optimization</small></div>
+            <div class="publication-list">
+              <article class="publication-item">
+                <div class="pub-date">2022</div>
+                <div class="pub-body">
+                  <div class="pub-meta"><span class="publisher-badge publisher-ieee">IEEE</span><span class="venue-name">Transactions on Vehicular Technology</span></div>
+                  <h4>DNN-Based Dynamic Transmit Power Control for V2V Communication Underlaid Cellular Uplink</h4>
+                  <p>D. Ron and J.-R. Lee</p>
+                  <div class="pub-tags"><span>V2V</span><span>DNN</span><span>Power Control</span></div>
+                </div>
+              </article>
+
+              <article class="publication-item">
+                <div class="pub-date">2021</div>
+                <div class="pub-body">
+                  <div class="pub-meta"><span class="publisher-badge publisher-ieee">IEEE</span><span class="venue-name">Transactions on Vehicular Technology</span></div>
+                  <h4>DRL-Based Sum-Rate Maximization in D2D Communication Underlaid Uplink Cellular Networks</h4>
+                  <p>D. Ron and J.-R. Lee</p>
+                  <div class="pub-tags"><span>D2D</span><span>Deep RL</span><span>Optimization</span></div>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+
+        <div class="publication-note reveal">
+          <strong>Full record:</strong>
+          <span>This is a selected list. For the complete and most current publication record, citation counts, and links, please visit Google Scholar.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRAJECTORY -->
+    <section class="section trajectory-section">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="section-kicker">Research Evolution</span>
+          <h2>A continuous path toward autonomous 6G infrastructure.</h2>
+        </div>
+
+        <div class="trajectory reveal">
+          <div class="trajectory-item">
+            <span class="trajectory-year">Foundation</span>
+            <h3>Wireless AI</h3>
+            <p>D2D · V2V · IoT · reinforcement learning · resource optimization</p>
+          </div>
+          <div class="trajectory-connector" aria-hidden="true">→</div>
+          <div class="trajectory-item">
+            <span class="trajectory-year">Expansion</span>
+            <h3>Intelligent Networks</h3>
+            <p>UAV · SAGIN · LEO · dynamic networking · mobility</p>
+          </div>
+          <div class="trajectory-connector" aria-hidden="true">→</div>
+          <div class="trajectory-item">
+            <span class="trajectory-year">Current</span>
+            <h3>Open RAN Intelligence</h3>
+            <p>xApps · KPMs · RIC · operational data · security</p>
+          </div>
+          <div class="trajectory-connector" aria-hidden="true">→</div>
+          <div class="trajectory-item trajectory-future">
+            <span class="trajectory-year">Research Agenda</span>
+            <h3>Autonomous AI-RAN + NTN</h3>
+            <p>AI workloads · compute orchestration · agents · trustworthy closed-loop control</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT / TEACHING -->
+    <section class="section section-light" id="about">
+      <div class="container about-grid">
+        <div class="about-copy reveal">
+          <span class="section-kicker">About</span>
+          <h2>Research at the intersection of AI, wireless systems, and programmable networks.</h2>
+          <p>
+            I am an Assistant Research Professor in Electrical and Computer Engineering at NC State University.
+            My work focuses on Open RAN, AI-RAN, trustworthy wireless intelligence, and LEO/NTN space networks.
+          </p>
+          <p>
+            A consistent theme across my research is moving beyond standalone algorithms toward systems that can
+            be measured, deployed, controlled, and experimentally evaluated under realistic network conditions.
+          </p>
+          <div class="about-meta">
+            <div><small>Current Role</small><strong>Assistant Research Professor</strong></div>
+            <div><small>Department</small><strong>Electrical &amp; Computer Engineering</strong></div>
+            <div><small>Institution</small><strong>NC State University</strong></div>
+            <div><small>Location</small><strong>Raleigh, North Carolina</strong></div>
+          </div>
+        </div>
+
+        <div class="teaching-panel reveal">
+          <div class="panel-label">Teaching &amp; Mentoring</div>
+          <h3>Connecting research to student training.</h3>
+          <div class="teaching-item">
+            <span>Teaching</span>
+            <strong>ECE 301 — Linear Systems</strong>
+            <small>NC State University</small>
+          </div>
+          <div class="teaching-item">
+            <span>Mentoring</span>
+            <strong>Undergraduate · M.S. · Ph.D. Researchers</strong>
+            <small>Wireless systems, AI, Open RAN, and space networking</small>
+          </div>
+          <div class="teaching-item">
+            <span>Student Research Areas</span>
+            <strong>Open RAN · AI-RAN · Wireless AI · LEO/NTN</strong>
+            <small>Algorithms, testbeds, data, and experimental systems</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact-section" id="contact">
+      <div class="container contact-layout reveal">
+        <div>
+          <span class="section-kicker section-kicker-light">Collaboration</span>
+          <h2>Building the next generation of intelligent wireless systems.</h2>
+          <p>
+            I welcome research collaborations, student inquiries, industry partnerships,
+            invited talks, and joint proposal opportunities in AI-RAN, Open RAN, wireless AI, and NTN.
+          </p>
+        </div>
+        <div class="contact-actions">
+          <!-- Replace with your preferred NC State email if different. -->
+          <a class="button light" href="mailto:your-email@ncsu.edu">Email Me</a>
+          <a class="button outline-light" href="https://scholar.google.com/citations?user=Y20bNZ8AAAAJ&amp;hl=en" target="_blank" rel="noopener noreferrer">Google Scholar ↗</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-layout">
+      <div class="footer-brand">
+        <span class="brand-mark" aria-hidden="true">DR</span>
+        <div><strong>Dr. Dara Ron</strong><span>AI-Native Wireless &amp; Space Networks</span></div>
+      </div>
+      <div class="footer-links">
+        <a href="#research">Research</a>
+        <a href="#systems">Systems</a>
+        <a href="#publications">Publications</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-copy">© <span id="current-year"></span> Dara Ron. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
