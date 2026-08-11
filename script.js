@@ -266,21 +266,36 @@
   // ------------------------------------------------------------
 
   const formatAnswer = value => {
-    const safe =
-      escapeHTML(value || "");
+    const markdown = String(value || "").trim();
 
-    return safe
-      .split(/\n{2,}/)
-      .map(paragraph => {
-        const formatted =
-          paragraph.replaceAll(
-            "\n",
-            "<br>"
-          );
+    if (!markdown) {
+      return "<p>No response returned.</p>";
+    }
 
-        return `<p>${formatted}</p>`;
-      })
-      .join("");
+    // If Marked fails to load, safely fall back to plain text.
+    if (!window.marked) {
+      const safe = markdown
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+      return `<p>${safe.replaceAll("\n", "<br>")}</p>`;
+    }
+
+    // Convert Markdown -> HTML
+    const rendered = marked.parse(markdown, {
+      gfm: true,
+      breaks: true
+    });
+
+    // Sanitize generated HTML
+    if (window.DOMPurify) {
+      return DOMPurify.sanitize(rendered);
+    }
+
+    return rendered;
   };
 
   // ------------------------------------------------------------
