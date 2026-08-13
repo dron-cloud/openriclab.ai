@@ -33,8 +33,8 @@
 
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
         <a href="#research">Research</a>
+         <a href="#wireless-copilot">WirelessAI Chatbot</a>
         <a href="#systems">Systems</a>
-        <a href="#wireless-copilot">WirelessAI</a>
         <a href="#impact">Impact</a>
         <a href="#funding">Funding</a>
         <a href="#publications">Publications</a>
@@ -219,6 +219,151 @@
       </div>
     </section>
 
+<!-- WirelessAI Chat -->
+<section class="section copilot-section" id="wireless-copilot">
+
+  <div class="container copilot-container">
+
+    <div class="section-heading heading-wide reveal">
+      <div>
+        <span class="section-kicker">Public AI Research Platform</span>
+        <h2>
+          WirelessAI Chat: standards-grounded answers for wireless systems.
+        </h2>
+      </div>
+
+      <p>
+        A public AI assistant helps students, researchers, and engineers
+        understand wireless systems through evidence-grounded explanations
+        drawn from <strong>3GPP, ITU, and O-RAN</strong> standards and
+        specifications. The goal is not a generic chatbot, but a wireless
+        engineering copilot that can reason across standards, explain concepts
+        at different expertise levels, and return traceable technical references.
+      </p>
+    </div>
+
+
+    <div class="copilot-grid copilot-grid-full">
+
+      <article
+        class="copilot-demo reveal copilot-demo-full"
+        aria-label="WirelessAI Chat">
+
+        <div class="copilot-window-top">
+
+          <div class="copilot-brand">
+            <span class="copilot-logo">W</span>
+
+            <div>
+              <strong>WirelessAI Chat</strong>
+              <small>Standards-grounded wireless intelligence</small>
+            </div>
+          </div>
+
+          <span class="prototype-badge">
+            Research Prototype
+          </span>
+
+        </div>
+
+
+        <div
+          class="chat-preview"
+          id="copilot-chat"
+          aria-live="polite">
+
+          <div class="chat-row assistant-row">
+
+            <div class="chat-avatar">AI</div>
+
+            <div class="chat-bubble assistant-bubble">
+              <p>
+                <strong>Welcome to WirelessAI Chat.</strong>
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="prompt-examples"
+          aria-label="Example WirelessAI questions">
+
+          <button
+            type="button"
+            class="prompt-chip"
+            data-prompt="Explain 5G handover for a beginner.">
+            5G handover
+          </button>
+
+          <button
+            type="button"
+            class="prompt-chip"
+            data-prompt="Compare O-RAN E2, A1, O1, and O2 interfaces.">
+            O-RAN interfaces
+          </button>
+
+          <button
+            type="button"
+            class="prompt-chip"
+            data-prompt="Why is Doppler challenging in LEO NTN systems?">
+            LEO Doppler
+          </button>
+
+          <button
+            type="button"
+            class="prompt-chip"
+            data-prompt="How do CQI, BLER, SINR, and MCS relate?">
+            CQI / BLER / MCS
+          </button>
+
+        </div>
+
+
+        <form
+          class="copilot-input-row"
+          id="copilot-preview-form">
+
+          <label
+            class="sr-only"
+            for="copilot-preview-input">
+            Ask a wireless systems question
+          </label>
+
+          <input
+            id="copilot-preview-input"
+            type="text"
+            placeholder="Ask about 5G, O-RAN, NTN, PHY, mobility, security..."
+            autocomplete="off"
+          />
+
+          <button
+            type="submit"
+            id="copilot-submit"
+            aria-label="Ask WirelessAI Chat">
+            Ask
+          </button>
+
+        </form>
+
+
+        <p
+          class="copilot-note"
+          id="copilot-preview-note">
+          Ollama Cloud connection is configured through a secure server-side
+          proxy; no API key is stored in this webpage.
+        </p>
+
+      </article>
+
+    </div>
+
+  </div>
+
+</section>
+
     <!-- FEATURED SYSTEMS -->
     <section class="section section-light" id="systems">
       <div class="container">
@@ -300,88 +445,7 @@
       </div>
     </section>
 
-    <!-- WirelessAI Chat -->
-    <section class="section copilot-section" id="wireless-copilot">
-      <div class="container">
-        <div class="section-heading heading-wide reveal">
-          <div>
-            <span class="section-kicker">Public AI Research Platform</span>
-            <h2>WirelessAI Chat: standards-grounded answers for wireless systems.</h2>
-          </div>
-          <p>
-            A public AI assistant helps students, researchers, and engineers understand
-            wireless systems through evidence-grounded explanations drawn from <strong>3GPP, ITU, and O-RAN</strong>
-            knowledge. The goal is not a generic chatbot, but a wireless engineering copilot that can reason across
-            standards, explain concepts at different expertise levels, and return traceable technical references.
-          </p>
-        </div>
-
-        <div class="copilot-grid">
-          <article class="copilot-demo reveal" aria-label="WirelessAI Chat preview">
-            <div class="copilot-window-top">
-              <div class="copilot-brand">
-                <span class="copilot-logo">W</span>
-                <div><strong>WirelessAI Chat</strong><small>Standards-grounded wireless intelligence</small></div>
-              </div>
-              <span class="prototype-badge">Research Prototype</span>
-            </div>
-
-            <div class="chat-preview" id="copilot-chat" aria-live="polite">
-              <div class="chat-row assistant-row">
-                <div class="chat-avatar">AI</div>
-                <div class="chat-bubble assistant-bubble">
-                  <p><strong>Welcome to WirelessAI Chat.</strong> </p>
-                </div>
-              </div>
-            </div>
-
-            <div class="prompt-examples" aria-label="Example WirelessAI questions">
-              <button type="button" class="prompt-chip" data-prompt="Explain 5G handover for a beginner.">5G handover</button>
-              <button type="button" class="prompt-chip" data-prompt="Compare O-RAN E2, A1, O1, and O2 interfaces.">O-RAN interfaces</button>
-              <button type="button" class="prompt-chip" data-prompt="Why is Doppler challenging in LEO NTN systems?">LEO Doppler</button>
-              <button type="button" class="prompt-chip" data-prompt="How do CQI, BLER, SINR, and MCS relate?">CQI / BLER / MCS</button>
-            </div>
-
-            <form class="copilot-input-row" id="copilot-preview-form">
-              <label class="sr-only" for="copilot-preview-input">Ask a wireless systems question</label>
-              <input id="copilot-preview-input" type="text" placeholder="Ask about 5G, O-RAN, NTN, PHY, mobility, security..." autocomplete="off" />
-              <button type="submit" id="copilot-submit" aria-label="Ask WirelessAI Chat">Ask</button>
-            </form>
-            <p class="copilot-note" id="copilot-preview-note">Ollama Cloud connection is configured through a secure server-side proxy; no API key is stored in this webpage.</p>
-          </article>
-
-          <div class="copilot-details reveal">
-            <div class="copilot-capability">
-              <span class="capability-index">01</span>
-              <div><h3>Standards Knowledge</h3><p>Structured retrieval across 3GPP technical specifications/reports, ITU recommendations, and O-RAN specifications with release/version metadata.</p></div>
-            </div>
-            <div class="copilot-capability">
-              <span class="capability-index">02</span>
-              <div><h3>LLM + RAG Reasoning</h3><p>Semantic retrieval, embeddings, and LLM reasoning combine the user question with the most relevant standards evidence instead of relying only on model memory.</p></div>
-            </div>
-            <div class="copilot-capability">
-              <span class="capability-index">03</span>
-              <div><h3>Traceable Answers</h3><p>Answers are designed to identify the relevant standard, topic, release, and supporting source so technical claims can be checked rather than accepted blindly.</p></div>
-            </div>
-            <div class="copilot-capability">
-              <span class="capability-index">04</span>
-              <div><h3>Adaptive Explanations</h3><p>The same wireless concept can be explained for a beginner, student, researcher, or practicing engineer—with equations and engineering context when useful.</p></div>
-            </div>
-
-            <div class="copilot-architecture">
-              <span>User Question</span><i>→</i><span>Standards Retrieval</span><i>→</i><span>LLM / API</span><i>→</i><span>Verification</span><i>→</i><span>Cited Answer</span>
-            </div>
-
-            <div class="copilot-domains">
-              <strong>Initial knowledge domains</strong>
-              <div>
-                <span>5G / 5G-Advanced</span><span>Open RAN</span><span>NTN / LEO</span><span>Wireless PHY</span><span>Mobility</span><span>Security</span><span>AI for Networks</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    
 
     <!-- INFRASTRUCTURE -->
     <section class="section infrastructure-section" id="infrastructure">
