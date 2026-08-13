@@ -687,237 +687,517 @@ body {
 }
 
 /* =========================================================
-   WirelessAI Copilot — public research platform
+   WIRELESSAI CHAT â€” COMPLETE FULL-WIDTH COMPONENT
    ========================================================= */
-.copilot-section {
-  position: relative;
+
+/* Section */
+#wireless-copilot {
+  background: linear-gradient(180deg, #f7f7f7 0%, #ffffff 100%);
+}
+
+/*
+  The rest of the site uses --container: 1220px.
+  WirelessAI intentionally gets a wider working area.
+*/
+#wireless-copilot .copilot-container {
+  width: min(94vw, 1600px);
+  max-width: 1600px;
+  margin-inline: auto;
+}
+
+/* Keep heading readable even though the chatbot is wider */
+#wireless-copilot .section-heading.heading-wide {
+  width: 100%;
+  max-width: none;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr);
+  gap: 64px;
+}
+
+/* Remove previous two-column chatbot layout */
+#wireless-copilot .copilot-grid,
+#wireless-copilot .copilot-grid-full {
+  display: block;
+  width: 100%;
+  max-width: none;
+}
+
+/* Main chatbot shell */
+#wireless-copilot .copilot-demo,
+#wireless-copilot .copilot-demo-full {
+  width: 100%;
+  max-width: none;
   overflow: hidden;
-  background: linear-gradient(180deg, #ffffff 0%, #fff8f8 100%);
-}
-.copilot-section::before {
-  content: "";
-  position: absolute;
-  width: 420px;
-  height: 420px;
-  right: -160px;
-  top: 70px;
-  border-radius: 50%;
-  background: rgba(204,0,0,.06);
-  filter: blur(10px);
-  pointer-events: none;
-}
-.copilot-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1.12fr .88fr;
-  gap: 30px;
-  align-items: stretch;
-}
-.copilot-demo {
-  overflow: hidden;
-  border: 1px solid #dedede;
-  border-top: 5px solid var(--red-500);
+  border: 1px solid #d9d9d9;
   border-radius: 22px;
-  background: #fff;
-  box-shadow: 0 24px 65px rgba(0,0,0,.10);
+  background: #ffffff;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .11);
 }
-.copilot-window-top {
+
+/* Header */
+#wireless-copilot .copilot-window-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 20px;
-  padding: 22px 24px;
-  border-bottom: 1px solid #ececec;
+  padding: 18px 22px;
+  border-bottom: 1px solid #e5e5e5;
   background: #fafafa;
 }
-.copilot-brand { display: flex; align-items: center; gap: 13px; }
-.copilot-logo {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border-radius: 10px;
-  color: #fff;
-  background: var(--red-500);
-  font-weight: 800;
-  font-size: 19px;
+
+#wireless-copilot .copilot-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
-.copilot-brand strong { display: block; font-size: 17px; line-height: 1.2; }
-.copilot-brand small { display: block; margin-top: 4px; color: #777; font-size: 11px; }
-.prototype-badge {
-  padding: 7px 10px;
-  border-radius: 999px;
-  color: #990000;
-  background: #ffe7e7;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-}
-.chat-preview { min-height: 365px; padding: 28px 24px 20px; background: #fff; }
-.chat-row { display: flex; gap: 11px; margin-bottom: 20px; }
-.user-row { justify-content: flex-end; }
-.chat-avatar {
-  width: 34px;
-  height: 34px;
-  flex: 0 0 auto;
+
+#wireless-copilot .copilot-logo {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   border-radius: 9px;
-  background: #000;
-  color: #fff;
-  font-size: 10px;
+  color: #ffffff;
+  background: #cc0000;
+  font-size: 15px;
   font-weight: 800;
+  line-height: 1;
 }
-.chat-bubble {
-  max-width: 82%;
-  padding: 15px 17px;
-  border-radius: 15px;
-  font-size: 14px;
-  line-height: 1.65;
-}
-.user-bubble { color: #fff; background: #181818; border-bottom-right-radius: 4px; }
-.assistant-bubble { color: #292929; background: #f6f6f6; border-bottom-left-radius: 4px; }
-.assistant-bubble p { margin: 0; color: inherit; font-size: inherit; }
-.answer-evidence { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 13px; }
-.answer-evidence span {
-  padding: 6px 8px;
-  border: 1px solid #f1c8c8;
-  border-radius: 7px;
-  color: #990000;
-  background: #fff;
-  font-size: 9px;
-  font-weight: 700;
-}
-.prompt-examples { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 24px 16px; }
-.prompt-chip {
-  border: 1px solid #dedede;
-  border-radius: 999px;
-  padding: 8px 11px;
-  color: #444;
-  background: #fff;
-  font-size: 10px;
-  font-weight: 650;
-  cursor: pointer;
-  transition: border-color .2s ease, color .2s ease, background .2s ease;
-}
-.prompt-chip:hover { border-color: var(--red-500); color: #990000; background: #fff6f6; }
-.copilot-input-row { display: flex; gap: 9px; padding: 0 24px; }
-.copilot-input-row input {
+
+#wireless-copilot .copilot-brand > div {
   min-width: 0;
-  flex: 1;
-  height: 50px;
-  border: 1px solid #d7d7d7;
-  border-radius: 11px;
-  padding: 0 15px;
-  outline: none;
-  color: #111;
-  background: #fff;
-  font-size: 13px;
-}
-.copilot-input-row input:focus { border-color: var(--red-500); box-shadow: 0 0 0 3px rgba(204,0,0,.08); }
-.copilot-input-row button {
-  min-width: 78px;
-  border: 0;
-  border-radius: 11px;
-  color: #fff;
-  background: var(--red-500);
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-}
-.copilot-input-row button:hover { background: #990000; }
-.copilot-note { margin: 10px 24px 22px; color: #8a8a8a; font-size: 10px; }
-.copilot-details { display: grid; gap: 13px; }
-.copilot-capability {
-  display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 17px;
-  padding: 21px;
-  border: 1px solid #e2e2e2;
-  border-radius: 16px;
-  background: rgba(255,255,255,.82);
-}
-.capability-index { color: var(--red-500); font-size: 12px; font-weight: 800; letter-spacing: .08em; }
-.copilot-capability h3 { margin: 0; font-size: 19px; letter-spacing: -.02em; }
-.copilot-capability p { margin: 7px 0 0; color: #666; font-size: 13px; line-height: 1.62; }
-.copilot-architecture {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 7px;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+#wireless-copilot .copilot-brand strong {
+  color: #111111;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+#wireless-copilot .copilot-brand small {
   margin-top: 3px;
-  padding: 18px;
-  border-radius: 14px;
-  color: #fff;
-  background: #000;
-}
-.copilot-architecture span { padding: 7px 9px; border-radius: 7px; background: #1e1e1e; font-size: 10px; font-weight: 700; }
-.copilot-architecture i { color: #ff7070; font-style: normal; font-weight: 800; }
-.copilot-domains { padding: 18px 20px; border-radius: 14px; background: #fff0f0; }
-.copilot-domains > strong { display: block; color: #720000; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
-.copilot-domains > div { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
-.copilot-domains span { padding: 6px 8px; border-radius: 7px; background: #fff; color: #555; font-size: 10px; font-weight: 700; }
-.sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
-
-@media (max-width: 980px) {
-  .copilot-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 620px) {
-  .copilot-window-top { align-items: flex-start; flex-direction: column; }
-  .chat-preview { min-height: 330px; padding-left: 16px; padding-right: 16px; }
-  .chat-bubble { max-width: 90%; font-size: 13px; }
-  .prompt-examples, .copilot-input-row { padding-left: 16px; padding-right: 16px; }
-  .copilot-note { margin-left: 16px; margin-right: 16px; }
-  .copilot-input-row { align-items: stretch; }
-  .copilot-input-row input { height: 48px; }
-  .copilot-capability { grid-template-columns: 40px 1fr; padding: 18px; }
+  color: #686868;
+  font-size: 11px;
 }
 
-/* ==========================
-   LIVE WIRELESSAI CHAT
-   ========================== */
-.chat-preview {
-  max-height: 430px;
+#wireless-copilot .prototype-badge {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid rgba(204, 0, 0, .16);
+  border-radius: 999px;
+  color: #990000;
+  background: #fff2f2;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+/* Conversation viewport */
+#wireless-copilot .chat-preview {
+  width: 100%;
+  height: clamp(500px, 58vh, 720px);
+  min-height: 500px;
+  max-height: 720px;
   overflow-y: auto;
+  padding: 26px 24px;
+  background: #ffffff;
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: #c9c9c9 transparent;
 }
-.chat-preview::-webkit-scrollbar { width: 7px; }
-.chat-preview::-webkit-scrollbar-thumb { background: #c9c9c9; border-radius: 999px; }
-.chat-disclaimer {
-  margin-top: 10px !important;
-  padding-top: 10px;
-  border-top: 1px solid #ececec;
-  color: #777;
-  font-size: 12px;
+
+#wireless-copilot .chat-preview::-webkit-scrollbar {
+  width: 7px;
 }
-.chat-bubble p:first-child { margin-top: 0; }
-.chat-bubble p:last-child { margin-bottom: 0; }
-.chat-loading {
+
+#wireless-copilot .chat-preview::-webkit-scrollbar-thumb {
+  background: #c9c9c9;
+  border-radius: 999px;
+}
+
+/* Chat rows */
+#wireless-copilot .chat-row {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 0 0 20px;
+}
+
+#wireless-copilot .assistant-row {
+  justify-content: flex-start;
+}
+
+#wireless-copilot .user-row {
+  justify-content: flex-end;
+}
+
+#wireless-copilot .chat-avatar {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #ffffff;
+  background: #cc0000;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* Message content */
+#wireless-copilot .chat-bubble {
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.72;
+}
+
+#wireless-copilot .assistant-bubble {
+  width: auto;
+  max-width: min(1000px, calc(100% - 52px));
+  padding: 2px 4px 2px 0;
+  color: #222222;
+  background: transparent;
+}
+
+#wireless-copilot .user-bubble {
+  max-width: min(78%, 900px);
+  padding: 12px 15px;
+  color: #ffffff;
+  background: #cc0000;
+  border-radius: 15px 15px 5px 15px;
+  white-space: pre-wrap;
+}
+
+#wireless-copilot .chat-bubble p:first-child {
+  margin-top: 0;
+}
+
+#wireless-copilot .chat-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+/* Markdown rendered in assistant answers */
+#wireless-copilot .assistant-bubble h1,
+#wireless-copilot .assistant-bubble h2,
+#wireless-copilot .assistant-bubble h3,
+#wireless-copilot .assistant-bubble h4 {
+  margin: 1.2em 0 .55em;
+  color: #111111;
+  line-height: 1.3;
+}
+
+#wireless-copilot .assistant-bubble h1 { font-size: 22px; }
+#wireless-copilot .assistant-bubble h2 { font-size: 20px; }
+#wireless-copilot .assistant-bubble h3 { font-size: 18px; }
+#wireless-copilot .assistant-bubble h4 { font-size: 16px; }
+
+#wireless-copilot .assistant-bubble ul,
+#wireless-copilot .assistant-bubble ol {
+  margin: .7em 0;
+  padding-left: 1.45em;
+}
+
+#wireless-copilot .assistant-bubble li {
+  margin: .3em 0;
+}
+
+#wireless-copilot .assistant-bubble code {
+  padding: .12em .35em;
+  border-radius: 5px;
+  background: #f2f2f2;
+  font-size: .92em;
+}
+
+#wireless-copilot .assistant-bubble pre {
+  overflow-x: auto;
+  margin: 14px 0;
+  padding: 14px 16px;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  background: #f7f7f7;
+  white-space: pre;
+}
+
+#wireless-copilot .assistant-bubble pre code {
+  padding: 0;
+  background: transparent;
+}
+
+#wireless-copilot .assistant-bubble table {
+  width: 100%;
+  margin: 14px 0;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+#wireless-copilot .assistant-bubble th,
+#wireless-copilot .assistant-bubble td {
+  padding: 9px 10px;
+  border: 1px solid #dddddd;
+  text-align: left;
+  vertical-align: top;
+}
+
+#wireless-copilot .assistant-bubble th {
+  background: #f4f4f4;
+  font-weight: 750;
+}
+
+#wireless-copilot .assistant-bubble blockquote {
+  margin: 14px 0;
+  padding: 8px 14px;
+  border-left: 3px solid #cc0000;
+  color: #555555;
+  background: #fafafa;
+}
+
+#wireless-copilot .assistant-bubble a {
+  color: #b00000;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Prompt suggestions */
+#wireless-copilot .prompt-examples {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 15px 22px 0;
+  background: #ffffff;
+}
+
+#wireless-copilot .prompt-chip {
+  appearance: none;
+  border: 1px solid #d8d8d8;
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #333333;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color .18s ease, color .18s ease, background .18s ease, transform .18s ease;
+}
+
+#wireless-copilot .prompt-chip:hover {
+  transform: translateY(-1px);
+  border-color: #cc0000;
+  color: #990000;
+  background: #fff7f7;
+}
+
+/* Input */
+#wireless-copilot .copilot-input-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 22px 12px;
+  background: #ffffff;
+}
+
+#wireless-copilot .copilot-input-row input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid #cfcfcf;
+  border-radius: 11px;
+  outline: none;
+  color: #111111;
+  background: #ffffff;
+  font-size: 14px;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+#wireless-copilot .copilot-input-row input:focus {
+  border-color: #cc0000;
+  box-shadow: 0 0 0 3px rgba(204, 0, 0, .10);
+}
+
+#wireless-copilot .copilot-input-row input::placeholder {
+  color: #7a7a7a;
+}
+
+#wireless-copilot #copilot-submit {
+  flex: 0 0 auto;
+  min-width: 88px;
+  min-height: 52px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 11px;
+  color: #ffffff;
+  background: #cc0000;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .18s ease, transform .18s ease;
+}
+
+#wireless-copilot #copilot-submit:hover {
+  transform: translateY(-1px);
+  background: #990000;
+}
+
+#wireless-copilot #copilot-submit:disabled,
+#wireless-copilot #copilot-preview-input:disabled {
+  cursor: wait;
+  opacity: .68;
+}
+
+/* Footer note */
+#wireless-copilot .copilot-note {
+  margin: 0;
+  padding: 0 22px 18px;
+  color: #777777;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+/* Loading indicator */
+#wireless-copilot .chat-loading {
   display: flex;
   align-items: center;
   gap: 5px;
   min-width: 62px;
   min-height: 38px;
 }
-.chat-loading span {
+
+#wireless-copilot .chat-loading span {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #777;
+  background: #777777;
   animation: wirelessai-dot 1.1s infinite ease-in-out;
 }
-.chat-loading span:nth-child(2) { animation-delay: .15s; }
-.chat-loading span:nth-child(3) { animation-delay: .30s; }
-@keyframes wirelessai-dot {
-  0%, 60%, 100% { transform: translateY(0); opacity: .35; }
-  30% { transform: translateY(-4px); opacity: 1; }
+
+#wireless-copilot .chat-loading span:nth-child(2) {
+  animation-delay: .15s;
 }
-#copilot-submit:disabled,
-#copilot-preview-input:disabled {
-  cursor: wait;
-  opacity: .68;
+
+#wireless-copilot .chat-loading span:nth-child(3) {
+  animation-delay: .30s;
+}
+
+@keyframes wirelessai-dot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: .35;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* Screen-reader-only utility used by the chatbot label */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Tablet */
+@media (max-width: 980px) {
+  #wireless-copilot .copilot-container {
+    width: calc(100% - 36px);
+    max-width: none;
+  }
+
+  #wireless-copilot .section-heading.heading-wide {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  #wireless-copilot .chat-preview {
+    height: 56vh;
+    min-height: 440px;
+    max-height: 620px;
+  }
+
+  #wireless-copilot .assistant-bubble {
+    max-width: calc(100% - 48px);
+  }
+}
+
+/* Mobile */
+@media (max-width: 680px) {
+  #wireless-copilot .copilot-container {
+    width: calc(100% - 28px);
+  }
+
+  #wireless-copilot .copilot-window-top {
+    align-items: flex-start;
+    padding: 15px 16px;
+  }
+
+  #wireless-copilot .prototype-badge {
+    display: none;
+  }
+
+  #wireless-copilot .chat-preview {
+    height: 58vh;
+    min-height: 400px;
+    max-height: 560px;
+    padding: 20px 15px;
+  }
+
+  #wireless-copilot .chat-bubble {
+    font-size: 14px;
+  }
+
+  #wireless-copilot .assistant-bubble {
+    max-width: calc(100% - 45px);
+  }
+
+  #wireless-copilot .user-bubble {
+    max-width: 88%;
+  }
+
+  #wireless-copilot .prompt-examples {
+    padding: 13px 15px 0;
+  }
+
+  #wireless-copilot .prompt-chip {
+    font-size: 11px;
+  }
+
+  #wireless-copilot .copilot-input-row {
+    gap: 8px;
+    padding: 14px 15px 10px;
+  }
+
+  #wireless-copilot .copilot-input-row input {
+    min-height: 48px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  #wireless-copilot #copilot-submit {
+    min-width: 70px;
+    min-height: 48px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  #wireless-copilot .copilot-note {
+    padding: 0 15px 15px;
+    font-size: 10px;
+  }
 }
