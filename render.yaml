@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: wirelessai-copilot-api
+    name: openriclab-ai
     runtime: python
     rootDir: backend
 
@@ -19,7 +19,28 @@ services:
         value: https://ollama.com/api
 
       - key: REQUEST_TIMEOUT_SECONDS
-        value: "180"
+        value: "300"
+
+      - key: OLLAMA_NUM_PREDICT
+        value: "-1"
+
+      - key: OLLAMA_THINKING
+        value: low
+
+      - key: MAX_USER_CHARACTERS
+        value: "6000"
+
+      - key: MAX_HISTORY_MESSAGES
+        value: "8"
+
+      - key: MAX_HISTORY_CHARACTERS_PER_MESSAGE
+        value: "4000"
+
+      - key: RATE_LIMIT_REQUESTS
+        value: "30"
+
+      - key: RATE_LIMIT_WINDOW_SECONDS
+        value: "600"
 
       - key: ALLOWED_ORIGINS
         value: https://dron-cloud.github.io

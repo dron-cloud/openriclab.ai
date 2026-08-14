@@ -2,15 +2,13 @@
   "use strict";
 
   // ============================================================
-  // General website behavior
+  // GENERAL WEBSITE
   // ============================================================
 
   const header = document.querySelector(".site-header");
   const navToggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".site-nav");
-  const navLinks = [
-    ...document.querySelectorAll('.site-nav a[href^="#"]')
-  ];
+  const navLinks = [...document.querySelectorAll('.site-nav a[href^="#"]')];
   const revealItems = document.querySelectorAll(".reveal");
   const year = document.getElementById("current-year");
 
@@ -58,25 +56,19 @@
   }
 
   // ------------------------------------------------------------
-  // Header styling on scroll
+  // Header state
   // ------------------------------------------------------------
 
   const updateHeader = () => {
     if (!header) return;
-
-    header.classList.toggle(
-      "scrolled",
-      window.scrollY > 18
-    );
+    header.classList.toggle("scrolled", window.scrollY > 18);
   };
 
   updateHeader();
 
-  window.addEventListener(
-    "scroll",
-    updateHeader,
-    { passive: true }
-  );
+  window.addEventListener("scroll", updateHeader, {
+    passive: true
+  });
 
   // ------------------------------------------------------------
   // Reveal animations
@@ -118,39 +110,33 @@
   // Active navigation link
   // ------------------------------------------------------------
 
-  const sectionIds = navLinks
+  const sections = navLinks
     .map(link => link.getAttribute("href"))
-    .filter(href => href && href.length > 1)
-    .map(href => href.slice(1));
-
-  const sections = sectionIds
-    .map(id => document.getElementById(id))
+    .filter(href => href && href.startsWith("#") && href.length > 1)
+    .map(href => document.getElementById(href.slice(1)))
     .filter(Boolean);
 
   if (
-    sections.length &&
+    sections.length > 0 &&
     "IntersectionObserver" in window
   ) {
     const sectionObserver = new IntersectionObserver(
       entries => {
-        const visibleEntries = entries
+        const visible = entries
           .filter(entry => entry.isIntersecting)
           .sort(
             (a, b) =>
-              b.intersectionRatio -
-              a.intersectionRatio
+              b.intersectionRatio - a.intersectionRatio
           );
 
-        if (!visibleEntries.length) return;
+        if (!visible.length) return;
 
-        const activeId =
-          visibleEntries[0].target.id;
+        const activeId = visible[0].target.id;
 
         navLinks.forEach(link => {
           link.classList.toggle(
             "active",
-            link.getAttribute("href") ===
-              `#${activeId}`
+            link.getAttribute("href") === `#${activeId}`
           );
         });
       },
@@ -169,88 +155,53 @@
   // Smooth scrolling
   // ------------------------------------------------------------
 
-  document
-    .querySelectorAll('a[href^="#"]')
-    .forEach(anchor => {
-      anchor.addEventListener(
-        "click",
-        event => {
-          const targetId =
-            anchor.getAttribute("href");
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener("click", event => {
+      const targetId = anchor.getAttribute("href");
 
-          if (
-            !targetId ||
-            targetId === "#"
-          ) {
-            return;
-          }
+      if (!targetId || targetId === "#") return;
 
-          const target =
-            document.querySelector(targetId);
+      const target = document.querySelector(targetId);
 
-          if (!target) return;
+      if (!target) return;
 
-          event.preventDefault();
+      event.preventDefault();
 
-          target.scrollIntoView({
-            behavior:
-              prefersReducedMotion
-                ? "auto"
-                : "smooth",
-            block: "start"
-          });
-        }
-      );
+      target.scrollIntoView({
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+        block: "start"
+      });
     });
+  });
 
   // ============================================================
-  // WirelessAI Copilot
-  // Ollama Cloud through secure Render backend
+  // GENERAL-PURPOSE AI CHAT
   // ============================================================
 
-  const copilotInput =
-    document.querySelector(
-      "#copilot-preview-input"
-    );
+  const chat = document.getElementById("copilot-chat");
+  const form = document.getElementById("copilot-preview-form");
+  const input = document.getElementById("copilot-preview-input");
+  const submit = document.getElementById("copilot-submit");
 
-  const copilotForm =
-    document.querySelector(
-      "#copilot-preview-form"
-    );
+  const apiMeta = document.querySelector(
+    'meta[name="wirelessai-api-url"]'
+  );
 
-  const copilotNote =
-    document.querySelector(
-      "#copilot-preview-note"
-    );
-
-  const copilotChat =
-    document.querySelector(
-      "#copilot-chat"
-    );
-
-  const copilotSubmit =
-    document.querySelector(
-      "#copilot-submit"
-    );
-
-  const apiMeta =
-    document.querySelector(
-      'meta[name="wirelessai-api-url"]'
-    );
-
-  const COPILOT_API_URL = (
+  const API_URL = (
     window.WIRELESSAI_API_URL ||
     apiMeta?.content ||
     ""
   ).trim();
 
-  // Short local conversation history
-  const conversation = [];
-
   const MAX_HISTORY_MESSAGES = 8;
+  const MAX_INPUT_CHARACTERS = 6000;
+  const REQUEST_TIMEOUT_MS = 310000;
+
+  let conversation = [];
+  let busy = false;
 
   // ------------------------------------------------------------
-  // HTML safety
+  // Safe answer formatting
   // ------------------------------------------------------------
 
   const escapeHTML = value =>
@@ -261,45 +212,47 @@
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
 
-  // ------------------------------------------------------------
-  // Format assistant answer
-  // ------------------------------------------------------------
-
   const formatAnswer = value => {
-    const markdown = String(value || "").trim();
+    const text = String(value || "");
 
-    if (!markdown) {
-      return "<p>No response returned.</p>";
+    if (
+      window.marked &&
+      typeof window.marked.parse === "function" &&
+      window.DOMPurify
+    ) {
+      try {
+        const rendered = window.marked.parse(text, {
+          gfm: true,
+          breaks: true
+        });
+
+        return window.DOMPurify.sanitize(rendered);
+      } catch (error) {
+        console.warn("Markdown rendering failed:", error);
+      }
     }
 
-    // If Marked fails to load, safely fall back to plain text.
-    if (!window.marked) {
-      const safe = markdown
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    return escapeHTML(text).replace(/\n/g, "<br>");
+  };
 
-      return `<p>${safe.replaceAll("\n", "<br>")}</p>`;
-    }
+  const secureLinks = container => {
+    if (!container) return;
 
-    // Convert Markdown -> HTML
-    const rendered = marked.parse(markdown, {
-      gfm: true,
-      breaks: true
+    container.querySelectorAll("a").forEach(link => {
+      const href = link.getAttribute("href") || "";
+
+      if (
+        href.startsWith("https://") ||
+        href.startsWith("http://")
+      ) {
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      }
     });
-
-    // Sanitize generated HTML
-    if (window.DOMPurify) {
-      return DOMPurify.sanitize(rendered);
-    }
-
-    return rendered;
   };
 
   // ------------------------------------------------------------
-  // Append message to chatbot
+  // Chat messages
   // ------------------------------------------------------------
 
   const appendMessage = (
@@ -307,62 +260,43 @@
     text,
     { loading = false } = {}
   ) => {
-    if (!copilotChat) return null;
+    if (!chat) return null;
 
-    const row =
-      document.createElement("div");
-
-    row.className =
-      `chat-row ${
-        role === "user"
-          ? "user-row"
-          : "assistant-row"
-      }`;
+    const row = document.createElement("div");
+    row.className = `chat-row ${
+      role === "user"
+        ? "user-row"
+        : "assistant-row"
+    }`;
 
     if (role === "assistant") {
-      const avatar =
-        document.createElement("div");
-
-      avatar.className =
-        "chat-avatar";
-
+      const avatar = document.createElement("div");
+      avatar.className = "chat-avatar";
       avatar.textContent = "AI";
-
       row.appendChild(avatar);
     }
 
-    const bubble =
-      document.createElement("div");
-
-    bubble.className =
-      `chat-bubble ${
-        role === "user"
-          ? "user-bubble"
-          : "assistant-bubble"
-      }`;
+    const bubble = document.createElement("div");
+    bubble.className = `chat-bubble ${
+      role === "user"
+        ? "user-bubble"
+        : "assistant-bubble"
+    }`;
 
     if (loading) {
-      bubble.classList.add(
-        "chat-loading"
-      );
-
-      bubble.textContent =
-        "Thinking…";
-    } else if (
-      role === "assistant"
-    ) {
-      bubble.innerHTML =
-        formatAnswer(text);
+      bubble.classList.add("chat-loading");
+      bubble.textContent = "Thinking…";
+    } else if (role === "assistant") {
+      bubble.innerHTML = formatAnswer(text);
+      secureLinks(bubble);
     } else {
       bubble.textContent = text;
     }
 
     row.appendChild(bubble);
+    chat.appendChild(row);
 
-    copilotChat.appendChild(row);
-
-    copilotChat.scrollTop =
-      copilotChat.scrollHeight;
+    chat.scrollTop = chat.scrollHeight;
 
     return row;
   };
@@ -371,300 +305,237 @@
   // Busy state
   // ------------------------------------------------------------
 
-  const setBusy = busy => {
-    if (copilotSubmit) {
-      copilotSubmit.disabled = busy;
+  const setBusy = state => {
+    busy = state;
 
-      copilotSubmit.textContent =
-        busy
-          ? "Thinking…"
-          : "Ask";
+    if (submit) {
+      submit.disabled = state;
+      submit.textContent = state
+        ? "Thinking…"
+        : "Ask";
     }
 
-    if (copilotInput) {
-      copilotInput.disabled = busy;
+    if (input) {
+      input.disabled = state;
     }
   };
 
   // ------------------------------------------------------------
-  // Prompt chips
+  // Input configuration
   // ------------------------------------------------------------
 
-  document
-    .querySelectorAll(".prompt-chip")
-    .forEach(chip => {
-      chip.addEventListener(
-        "click",
-        () => {
-          if (!copilotInput) return;
-
-          copilotInput.value =
-            chip.dataset.prompt ||
-            chip.textContent.trim();
-
-          copilotInput.focus();
-        }
-      );
-    });
-
-  // ------------------------------------------------------------
-  // Chat submit
-  // ------------------------------------------------------------
-
-  if (copilotForm) {
-    copilotForm.addEventListener(
-      "submit",
-      async event => {
-        event.preventDefault();
-
-        const question =
-          copilotInput?.value.trim();
-
-        if (!question) {
-          copilotInput?.focus();
-          return;
-        }
-
-        // ----------------------------------------
-        // Backend URL missing
-        // ----------------------------------------
-
-        if (!COPILOT_API_URL) {
-          appendMessage(
-            "user",
-            question
-          );
-
-          appendMessage(
-            "assistant",
-            "WirelessAI is not connected to the backend. Please configure the wirelessai-api-url meta tag in index.html."
-          );
-
-          if (copilotNote) {
-            copilotNote.textContent =
-              "Backend URL is not configured.";
-          }
-
-          return;
-        }
-
-        // ----------------------------------------
-        // Show user question
-        // ----------------------------------------
-
-        appendMessage(
-          "user",
-          question
-        );
-
-        conversation.push({
-          role: "user",
-          content: question
-        });
-
-        if (copilotInput) {
-          copilotInput.value = "";
-        }
-
-        setBusy(true);
-
-        const loadingRow =
-          appendMessage(
-            "assistant",
-            "",
-            { loading: true }
-          );
-
-        // ----------------------------------------
-        // Send question to backend
-        // ----------------------------------------
-
-        try {
-          const response =
-            await fetch(
-              COPILOT_API_URL,
-              {
-                method: "POST",
-
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                },
-
-                body: JSON.stringify({
-                  message: question,
-
-                  history:
-                    conversation.slice(
-                      -MAX_HISTORY_MESSAGES
-                    )
-                })
-              }
-            );
-
-          // --------------------------------------
-          // Parse backend response
-          // --------------------------------------
-
-          const payload =
-            await response
-              .json()
-              .catch(() => ({}));
-
-          if (!response.ok) {
-            throw new Error(
-              payload.detail ||
-              payload.error ||
-              `HTTP ${response.status}`
-            );
-          }
-
-          const answer =
-            payload.answer ||
-            payload.message ||
-            "No answer was returned.";
-
-          // --------------------------------------
-          // Replace loading bubble
-          // --------------------------------------
-
-          loadingRow?.remove();
-
-          appendMessage(
-            "assistant",
-            answer
-          );
-
-          // --------------------------------------
-          // Save assistant response
-          // --------------------------------------
-
-          conversation.push({
-            role: "assistant",
-            content: answer
-          });
-
-          if (
-            conversation.length >
-            MAX_HISTORY_MESSAGES
-          ) {
-            conversation.splice(
-              0,
-              conversation.length -
-                MAX_HISTORY_MESSAGES
-            );
-          }
-
-          // --------------------------------------
-          // Status message
-          // --------------------------------------
-
-          if (copilotNote) {
-            const model =
-              payload.model
-                ? ` · ${payload.model}`
-                : "";
-
-            const provider =
-              payload.provider
-                ? ` · ${payload.provider}`
-                : "";
-
-            copilotNote.textContent =
-              `Live${provider}${model}. API credentials remain securely on the server.`;
-          }
-        } catch (error) {
-          // --------------------------------------
-          // Request failure
-          // --------------------------------------
-
-          loadingRow?.remove();
-
-          console.error(
-            "WirelessAI error:",
-            error
-          );
-
-          appendMessage(
-            "assistant",
-            `I could not reach the WirelessAI backend. ${error.message}`
-          );
-
-          if (copilotNote) {
-            copilotNote.textContent =
-              "Connection error — verify the Render backend URL, CORS settings, and Ollama configuration.";
-          }
-        } finally {
-          setBusy(false);
-
-          copilotInput?.focus();
-        }
-      }
-    );
+  if (input) {
+    input.maxLength = MAX_INPUT_CHARACTERS;
   }
 
-  // ============================================================
-  // Optional backend health check
-  // ============================================================
+  // ------------------------------------------------------------
+  // Submit question
+  // ------------------------------------------------------------
 
-  const checkBackendHealth =
-    async () => {
-      if (
-        !COPILOT_API_URL ||
-        !copilotNote
-      ) {
+  if (form && input && chat) {
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      if (busy) return;
+
+      const question = input.value.trim();
+
+      if (!question) {
+        input.focus();
         return;
       }
 
-      try {
-        const healthURL =
-          COPILOT_API_URL.replace(
-            /\/api\/chat\/?$/,
-            "/api/health"
-          );
+      if (!API_URL) {
+        appendMessage("user", question);
+        appendMessage(
+          "assistant",
+          "The AI backend URL is not configured."
+        );
+        return;
+      }
 
-        const response =
-          await fetch(
-            healthURL,
-            {
-              method: "GET"
-            }
-          );
+      const historyForRequest = conversation.slice(
+        -MAX_HISTORY_MESSAGES
+      );
+
+      appendMessage("user", question);
+
+      conversation.push({
+        role: "user",
+        content: question
+      });
+
+      input.value = "";
+      setBusy(true);
+
+      const loadingRow = appendMessage(
+        "assistant",
+        "",
+        { loading: true }
+      );
+
+      const controller = new AbortController();
+
+      const timeoutId = window.setTimeout(
+        () => controller.abort(),
+        REQUEST_TIMEOUT_MS
+      );
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: question,
+            history: historyForRequest
+          }),
+          signal: controller.signal
+        });
+
+        const payload = await response
+          .json()
+          .catch(() => ({}));
 
         if (!response.ok) {
+          let message =
+            payload.detail ||
+            payload.error ||
+            `HTTP ${response.status}`;
+
+          if (response.status === 429) {
+            message =
+              "Too many requests. Please wait a few minutes and try again.";
+          } else if (response.status === 413) {
+            message =
+              "Your message is too long.";
+          } else if (response.status === 504) {
+            message =
+              "The AI model took too long to respond. Please try again.";
+          }
+
+          throw new Error(message);
+        }
+
+        const answer = String(
+          payload.answer ||
+          payload.message ||
+          ""
+        ).trim();
+
+        if (!answer) {
           throw new Error(
-            `HTTP ${response.status}`
+            "The AI model returned an empty response."
           );
         }
 
-        const payload =
-          await response.json();
+        loadingRow?.remove();
+
+        appendMessage(
+          "assistant",
+          answer
+        );
+
+        conversation.push({
+          role: "assistant",
+          content: answer
+        });
 
         if (
-          payload.status === "ok"
+          conversation.length >
+          MAX_HISTORY_MESSAGES
         ) {
-          const model =
-            payload.model
-              ? ` · ${payload.model}`
-              : "";
-
-          copilotNote.textContent =
-            `WirelessAI online${model}.`;
-        } else {
-          copilotNote.textContent =
-            "WirelessAI backend is online, but the Ollama API key may not be configured.";
+          conversation = conversation.slice(
+            -MAX_HISTORY_MESSAGES
+          );
         }
       } catch (error) {
-        console.warn(
-          "WirelessAI health check failed:",
+        loadingRow?.remove();
+
+        console.error(
+          "AI Chat error:",
           error
         );
 
-        copilotNote.textContent =
-          "WirelessAI backend is currently unavailable.";
+        let message =
+          "I could not reach the AI backend.";
+
+        if (
+          error &&
+          error.name === "AbortError"
+        ) {
+          message =
+            "The request timed out. Please try again.";
+        } else if (
+          error &&
+          error.message
+        ) {
+          message = error.message;
+        }
+
+        appendMessage(
+          "assistant",
+          message
+        );
+
+        // Remove unanswered user message from local history.
+        if (
+          conversation.length &&
+          conversation[
+            conversation.length - 1
+          ].role === "user"
+        ) {
+          conversation.pop();
+        }
+      } finally {
+        window.clearTimeout(timeoutId);
+        setBusy(false);
+        input.focus();
       }
-    };
+    });
+  }
+
+  // ============================================================
+  // OPTIONAL BACKEND HEALTH CHECK
+  // ============================================================
+
+  const checkBackendHealth = async () => {
+    if (!API_URL) return;
+
+    const healthURL = API_URL.replace(
+      /\/api\/chat\/?$/,
+      "/api/health"
+    );
+
+    try {
+      const response = await fetch(
+        healthURL,
+        {
+          method: "GET",
+          cache: "no-store"
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `HTTP ${response.status}`
+        );
+      }
+
+      const payload = await response.json();
+
+      console.info(
+        "AI Chat backend:",
+        payload
+      );
+    } catch (error) {
+      console.warn(
+        "AI Chat health check failed:",
+        error
+      );
+    }
+  };
 
   checkBackendHealth();
-
 })();
