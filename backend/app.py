@@ -568,36 +568,16 @@ async def chat(
     # --------------------------------------------------------
 
     payload = {
-        "model":
-            OLLAMA_MODEL,
-
-        "messages":
-            messages,
-
-        "stream":
-            False,
-
-        "think":
-            get_thinking_setting(),
-
-        "options": {
-            "temperature":
-                0.25,
-
-            "num_predict":
-                OLLAMA_NUM_PREDICT,
-        },
+        "model": OLLAMA_MODEL,
+        "messages": messages,
+        "stream": False,
+        "think": get_thinking_setting(),
     }
 
     headers = {
-        "Authorization":
-            f"Bearer {OLLAMA_API_KEY}",
-
-        "Content-Type":
-            "application/json",
-
-        "Accept":
-            "application/json",
+        "Authorization": f"Bearer {OLLAMA_API_KEY}",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
     }
 
     # --------------------------------------------------------
@@ -646,20 +626,21 @@ async def chat(
     # --------------------------------------------------------
 
     if response.status_code >= 400:
+        error_text = response.text[:1000]
+
         print(
             "Ollama HTTP error:",
             response.status_code,
-            response.text[:1000],
+            error_text,
         )
 
         raise HTTPException(
             status_code=502,
             detail=(
-                "The AI model service returned "
-                "an error. Please try again."
+                f"Ollama returned HTTP {response.status_code}: "
+                f"{error_text}"
             ),
         )
-
     # --------------------------------------------------------
     # Parse response
     # --------------------------------------------------------
