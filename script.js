@@ -269,9 +269,9 @@
   const MAX_HISTORY_MESSAGES = 8;
   const MAX_INPUT_CHARACTERS = 6000;
 
-  // Backend timeout is 180 seconds.
-  // Browser timeout is slightly longer.
-  const REQUEST_TIMEOUT_MS = 190000;
+  // Streaming uses an idle timeout rather than one absolute timer.
+  // Any backend progress event or answer chunk resets this timer.
+  const REQUEST_IDLE_TIMEOUT_MS = 190000;
 
   let conversation = [];
   let busy = false;
@@ -575,7 +575,7 @@
   updateLanguageUI("en");
 
   // ============================================================
-  // FORM SUBMISSION
+  // FORM SUBMISSION — STREAMING
   // ============================================================
 
   if (
@@ -627,6 +627,9 @@
           return;
         }
 
+        const requestLanguage =
+          selectedLanguage;
+
         const historyForRequest =
           conversation.slice(
             -MAX_HISTORY_MESSAGES
@@ -658,12 +661,107 @@
         const controller =
           new AbortController();
 
-        const timeoutId =
-          window.setTimeout(
-            () =>
-              controller.abort(),
-            REQUEST_TIMEOUT_MS
-          );
+        let idleTimeoutId = null;
+
+        const resetIdleTimeout =
+          () => {
+            if (idleTimeoutId) {
+              window.clearTimeout(
+                idleTimeoutId
+              );
+            }
+
+            idleTimeoutId =
+              window.setTimeout(
+                () =>
+                  controller.abort(),
+                REQUEST_IDLE_TIMEOUT_MS
+              );
+          };
+
+        resetIdleTimeout();
+
+        let assistantRow = null;
+        let assistantBubble = null;
+        let answer = "";
+        let streamBuffer = "";
+
+        const ensureAssistantBubble =
+          () => {
+            if (assistantBubble) {
+              return assistantBubble;
+            }
+
+            loadingRow?.remove();
+
+            assistantRow =
+              appendMessage(
+                "assistant",
+                ""
+              );
+
+            assistantBubble =
+              assistantRow?.querySelector(
+                ".assistant-bubble"
+              ) || null;
+
+            return assistantBubble;
+          };
+
+        const renderStreamingAnswer =
+          () => {
+            const bubble =
+              ensureAssistantBubble();
+
+            if (!bubble) return;
+
+            bubble.innerHTML =
+              formatAnswer(answer);
+
+            secureLinks(
+              bubble
+            );
+
+            chat.scrollTop =
+              chat.scrollHeight;
+          };
+
+        const updateLoadingStage =
+          stage => {
+            const bubble =
+              loadingRow?.querySelector(
+                ".assistant-bubble"
+              );
+
+            if (!bubble) return;
+
+            if (
+              requestLanguage === "km"
+            ) {
+              if (
+                stage ===
+                "translating_question"
+              ) {
+                bubble.textContent =
+                  "កំពុងបកប្រែសំណួរ...";
+              } else if (
+                stage ===
+                "reasoning"
+              ) {
+                bubble.textContent =
+                  "កំពុងគិត...";
+              } else if (
+                stage ===
+                "translating_answer"
+              ) {
+                bubble.textContent =
+                  "កំពុងរៀបចំចម្លើយជាភាសាខ្មែរ...";
+              }
+            } else {
+              bubble.textContent =
+                "Thinking…";
+            }
+          };
 
         try {
           const response =
@@ -675,7 +773,9 @@
 
                 headers: {
                   "Content-Type":
-                    "application/json"
+                    "application/json",
+                  "Accept":
+                    "application/x-ndjson"
                 },
 
                 body:
@@ -687,7 +787,7 @@
                       historyForRequest,
 
                     language:
-                      selectedLanguage
+                      requestLanguage
                   }),
 
                 signal:
@@ -695,14 +795,16 @@
               }
             );
 
-          const payload =
-            await response
-              .json()
-              .catch(
-                () => ({})
-              );
+          resetIdleTimeout();
 
           if (!response.ok) {
+            const payload =
+              await response
+                .json()
+                .catch(
+                  () => ({})
+                );
+
             let message =
               payload.detail ||
               payload.error ||
@@ -712,21 +814,21 @@
               response.status === 429
             ) {
               message =
-                selectedLanguage === "km"
+                requestLanguage === "km"
                   ? "មានសំណើច្រើនពេក។ សូមរង់ចាំបន្តិច ហើយសាកល្បងម្តងទៀត។"
                   : "Too many requests. Please wait a few minutes and try again.";
             } else if (
               response.status === 413
             ) {
               message =
-                selectedLanguage === "km"
+                requestLanguage === "km"
                   ? "សាររបស់អ្នកវែងពេក។"
                   : "Your message is too long.";
             } else if (
               response.status === 504
             ) {
               message =
-                selectedLanguage === "km"
+                requestLanguage === "km"
                   ? "AI ចំណាយពេលយូរពេកក្នុងការឆ្លើយតប។ សូមសាកល្បងម្តងទៀត។"
                   : "The AI model took too long to respond. Please try again.";
             }
@@ -736,27 +838,193 @@
             );
           }
 
-          const answer =
-            String(
-              payload.answer ||
-              payload.message ||
-              ""
-            ).trim();
-
-          if (!answer) {
+          if (
+            !response.body ||
+            typeof response.body.getReader !==
+              "function"
+          ) {
             throw new Error(
-              selectedLanguage === "km"
+              requestLanguage === "km"
+                ? "កម្មវិធីរុករកនេះមិនគាំទ្រ AI streaming ទេ។"
+                : "This browser does not support AI streaming."
+            );
+          }
+
+          const reader =
+            response.body.getReader();
+
+          const decoder =
+            new TextDecoder(
+              "utf-8"
+            );
+
+          let streamDone = false;
+
+          while (!streamDone) {
+            const {
+              value,
+              done
+            } = await reader.read();
+
+            if (done) {
+              break;
+            }
+
+            resetIdleTimeout();
+
+            streamBuffer +=
+              decoder.decode(
+                value,
+                {
+                  stream: true
+                }
+              );
+
+            const lines =
+              streamBuffer.split(
+                "\n"
+              );
+
+            streamBuffer =
+              lines.pop() || "";
+
+            for (
+              const rawLine
+              of lines
+            ) {
+              const line =
+                rawLine.trim();
+
+              if (!line) continue;
+
+              let eventPayload;
+
+              try {
+                eventPayload =
+                  JSON.parse(line);
+              } catch (parseError) {
+                console.warn(
+                  "Invalid AI stream event:",
+                  line,
+                  parseError
+                );
+
+                continue;
+              }
+
+              resetIdleTimeout();
+
+              if (
+                eventPayload.type ===
+                "status"
+              ) {
+                updateLoadingStage(
+                  eventPayload.stage
+                );
+
+                continue;
+              }
+
+              if (
+                eventPayload.type ===
+                "chunk"
+              ) {
+                const chunk =
+                  String(
+                    eventPayload.content ||
+                    ""
+                  );
+
+                if (!chunk) {
+                  continue;
+                }
+
+                answer += chunk;
+
+                renderStreamingAnswer();
+
+                continue;
+              }
+
+              if (
+                eventPayload.type ===
+                "error"
+              ) {
+                throw new Error(
+                  eventPayload.message ||
+                    (
+                      requestLanguage === "km"
+                        ? "AI service មានបញ្ហា។ សូមសាកល្បងម្តងទៀត។"
+                        : "The AI service encountered an error. Please try again."
+                    )
+                );
+              }
+
+              if (
+                eventPayload.type ===
+                "done"
+              ) {
+                streamDone = true;
+              }
+            }
+          }
+
+          streamBuffer +=
+            decoder.decode();
+
+          if (
+            streamBuffer.trim()
+          ) {
+            try {
+              const finalEvent =
+                JSON.parse(
+                  streamBuffer.trim()
+                );
+
+              if (
+                finalEvent.type ===
+                  "chunk"
+              ) {
+                answer +=
+                  String(
+                    finalEvent.content ||
+                    ""
+                  );
+
+                renderStreamingAnswer();
+              } else if (
+                finalEvent.type ===
+                  "error"
+              ) {
+                throw new Error(
+                  finalEvent.message ||
+                    "The AI service encountered an error."
+                );
+              }
+            } catch (parseError) {
+              if (
+                parseError instanceof
+                  SyntaxError
+              ) {
+                console.warn(
+                  "Incomplete final AI stream event:",
+                  streamBuffer
+                );
+              } else {
+                throw parseError;
+              }
+            }
+          }
+
+          if (!answer.trim()) {
+            loadingRow?.remove();
+
+            throw new Error(
+              requestLanguage === "km"
                 ? "AI មិនបានផ្តល់ចម្លើយទេ។"
                 : "The AI model returned an empty response."
             );
           }
-
-          loadingRow?.remove();
-
-          appendMessage(
-            "assistant",
-            answer
-          );
 
           conversation.push({
             role:
@@ -783,8 +1051,10 @@
             error
           );
 
+          assistantRow?.remove();
+
           let message =
-            selectedLanguage === "km"
+            requestLanguage === "km"
               ? "មិនអាចភ្ជាប់ទៅ AI backend បានទេ។"
               : "I could not reach the AI backend.";
 
@@ -794,7 +1064,7 @@
               "AbortError"
           ) {
             message =
-              selectedLanguage === "km"
+              requestLanguage === "km"
                 ? "សំណើបានផុតកំណត់ពេល។ សូមសាកល្បងម្តងទៀត។"
                 : "The request timed out. Please try again.";
           } else if (
@@ -810,7 +1080,6 @@
             message
           );
 
-          // Remove the unanswered user turn.
           if (
             conversation.length &&
             conversation[
@@ -820,9 +1089,11 @@
             conversation.pop();
           }
         } finally {
-          window.clearTimeout(
-            timeoutId
-          );
+          if (idleTimeoutId) {
+            window.clearTimeout(
+              idleTimeoutId
+            );
+          }
 
           setBusy(
             false
