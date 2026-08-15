@@ -160,12 +160,60 @@ You are a conversational assistant for general-purpose use.
 """.strip()
 
 
+KHMER_LANGUAGE_INSTRUCTIONS = """
+Respond primarily in natural, clear Khmer (ភាសាខ្មែរ).
+
+Language rules:
+
+1. Use Khmer-first explanations.
+2. For technical, scientific, engineering, computing, medical, business,
+   or academic terms, include the commonly used English term in parentheses
+   when helpful.
+3. Do not force literal Khmer translations when they sound unnatural,
+   ambiguous, uncommon, or technically inaccurate.
+4. Keep widely recognized acronyms, standards, software names, programming
+   languages, equations, model names, and protocol names in their original form.
+5. Preserve technical notation such as AI, LLM, GPU, CPU, API, Python, 5G, 6G,
+   O-RAN, AI-RAN, Wi-Fi, TCP/IP, HTTP, JSON, SQL, and similar terms.
+6. Preserve equations, mathematical symbols, variable names, code, units,
+   standards identifiers, and file names when appropriate.
+7. If a technical concept does not have a clear established Khmer term,
+   explain the concept naturally in Khmer and retain the English term.
+8. Avoid awkward word-for-word translation from English into Khmer.
+9. For beginner questions, use simple and accessible Khmer.
+10. For advanced technical questions, keep precise English terminology alongside
+    the Khmer explanation.
+11. If the user explicitly asks for English only, answer in English.
+12. If the user mixes Khmer and English, respond naturally in Khmer while
+    preserving useful English technical terminology.
+
+Examples of preferred style:
+
+- បញ្ញាសិប្បនិម្មិត (Artificial Intelligence)
+- ការរៀនម៉ាស៊ីន (Machine Learning)
+- បណ្តាញសរសៃប្រសាទ (Neural Network)
+- គំរូភាសាខ្នាតធំ (Large Language Model: LLM)
+- កុំព្យូទ័រពពក (Cloud Computing)
+- បណ្តាញឥតខ្សែ (Wireless Network)
+- ផ្កាយរណបគន្លងទាប (Low-Earth-Orbit Satellite: LEO)
+
+Accuracy rules:
+
+- Never fabricate facts, citations, standards, references, or quotations.
+- If uncertain about a Khmer translation, prefer the established English
+  technical term with a clear Khmer explanation instead of inventing a translation.
+""".strip()
+
+
 # ============================================================
 # Request models
 # ============================================================
 
 class HistoryMessage(BaseModel):
-    role: Literal["user", "assistant"]
+    role: Literal[
+        "user",
+        "assistant",
+    ]
 
     content: str = Field(
         min_length=1,
@@ -184,6 +232,11 @@ class ChatRequest(BaseModel):
         max_length=12,
     )
 
+    language: Literal[
+        "en",
+        "km",
+    ] = "en"
+
 
 # ============================================================
 # FastAPI
@@ -192,9 +245,10 @@ class ChatRequest(BaseModel):
 app = FastAPI(
     title="AI Chat API",
     description=(
-        "General-purpose AI chat interface backed by Ollama Cloud."
+        "General-purpose bilingual English/Khmer AI chat "
+        "interface backed by Ollama Cloud."
     ),
-    version="4.0.0",
+    version="5.0.0",
 )
 
 
@@ -217,7 +271,10 @@ app.add_middleware(
 # Basic in-memory rate limiter
 # ============================================================
 
-request_log: dict[str, deque[float]] = defaultdict(deque)
+request_log: dict[
+    str,
+    deque[float],
+] = defaultdict(deque)
 
 
 def get_client_ip(
@@ -240,10 +297,15 @@ def get_client_ip(
 def enforce_rate_limit(
     request: Request,
 ) -> None:
-    client_ip = get_client_ip(request)
+    client_ip = get_client_ip(
+        request
+    )
+
     now = time.monotonic()
 
-    timestamps = request_log[client_ip]
+    timestamps = request_log[
+        client_ip
+    ]
 
     cutoff = (
         now
@@ -276,17 +338,41 @@ def enforce_rate_limit(
 # ============================================================
 
 def get_thinking_setting():
-    if OLLAMA_MODEL.lower().startswith("gpt-oss"):
+    if OLLAMA_MODEL.lower().startswith(
+        "gpt-oss"
+    ):
         return OLLAMA_THINKING
 
     return False
+
+
+def build_system_prompt(
+    language: str,
+) -> str:
+    if language == "km":
+        return (
+            SYSTEM_PROMPT
+            + "\n\n"
+            + KHMER_LANGUAGE_INSTRUCTIONS
+        )
+
+    return (
+        SYSTEM_PROMPT
+        + "\n\n"
+        + (
+            "Respond in clear, natural English unless the user "
+            "explicitly asks for another language."
+        )
+    )
 
 
 def clean_history(
     history: list[HistoryMessage],
     current_message: str,
 ) -> list[dict[str, str]]:
-    cleaned: list[dict[str, str]] = []
+    cleaned: list[
+        dict[str, str]
+    ] = []
 
     recent_history = history[
         -MAX_HISTORY_MESSAGES:
@@ -305,8 +391,11 @@ def clean_history(
 
         cleaned.append(
             {
-                "role": message.role,
-                "content": content,
+                "role":
+                    message.role,
+
+                "content":
+                    content,
             }
         )
 
@@ -330,9 +419,19 @@ def clean_history(
 @app.get("/")
 async def root() -> dict:
     return {
-        "service": "AI Chat",
-        "status": "ok",
-        "model": OLLAMA_MODEL,
+        "service":
+            "AI Chat",
+
+        "status":
+            "ok",
+
+        "model":
+            OLLAMA_MODEL,
+
+        "languages": [
+            "en",
+            "km",
+        ],
     }
 
 
@@ -344,10 +443,23 @@ async def health() -> dict:
             if OLLAMA_API_KEY
             else "missing_api_key"
         ),
-        "model": OLLAMA_MODEL,
-        "ollama_api_base": OLLAMA_API_BASE,
-        "num_predict": OLLAMA_NUM_PREDICT,
-        "thinking": get_thinking_setting(),
+
+        "model":
+            OLLAMA_MODEL,
+
+        "ollama_api_base":
+            OLLAMA_API_BASE,
+
+        "num_predict":
+            OLLAMA_NUM_PREDICT,
+
+        "thinking":
+            get_thinking_setting(),
+
+        "languages": [
+            "en",
+            "km",
+        ],
     }
 
 
@@ -356,7 +468,17 @@ async def chat(
     request_body: ChatRequest,
     request: Request,
 ) -> dict:
-    enforce_rate_limit(request)
+    # --------------------------------------------------------
+    # Rate limit
+    # --------------------------------------------------------
+
+    enforce_rate_limit(
+        request
+    )
+
+    # --------------------------------------------------------
+    # Validate API key
+    # --------------------------------------------------------
 
     if not OLLAMA_API_KEY:
         raise HTTPException(
@@ -367,7 +489,14 @@ async def chat(
             ),
         )
 
-    user_message = request_body.message.strip()
+    # --------------------------------------------------------
+    # Validate message
+    # --------------------------------------------------------
+
+    user_message = (
+        request_body.message
+        .strip()
+    )
 
     if (
         len(user_message)
@@ -382,6 +511,20 @@ async def chat(
             ),
         )
 
+    # --------------------------------------------------------
+    # Build language-aware system prompt
+    # --------------------------------------------------------
+
+    system_prompt = (
+        build_system_prompt(
+            request_body.language
+        )
+    )
+
+    # --------------------------------------------------------
+    # Conversation history
+    # --------------------------------------------------------
+
     history = clean_history(
         request_body.history,
         user_message,
@@ -389,32 +532,64 @@ async def chat(
 
     messages = [
         {
-            "role": "system",
-            "content": SYSTEM_PROMPT,
+            "role":
+                "system",
+
+            "content":
+                system_prompt,
         },
+
         *history,
+
         {
-            "role": "user",
-            "content": user_message,
+            "role":
+                "user",
+
+            "content":
+                user_message,
         },
     ]
 
+    # --------------------------------------------------------
+    # Ollama payload
+    # --------------------------------------------------------
+
     payload = {
-        "model": OLLAMA_MODEL,
-        "messages": messages,
-        "stream": False,
-        "think": get_thinking_setting(),
+        "model":
+            OLLAMA_MODEL,
+
+        "messages":
+            messages,
+
+        "stream":
+            False,
+
+        "think":
+            get_thinking_setting(),
+
         "options": {
-            "temperature": 0.30,
-            "num_predict": OLLAMA_NUM_PREDICT,
+            "temperature":
+                0.30,
+
+            "num_predict":
+                OLLAMA_NUM_PREDICT,
         },
     }
 
     headers = {
-        "Authorization": f"Bearer {OLLAMA_API_KEY}",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
+        "Authorization":
+            f"Bearer {OLLAMA_API_KEY}",
+
+        "Content-Type":
+            "application/json",
+
+        "Accept":
+            "application/json",
     }
+
+    # --------------------------------------------------------
+    # Send request to Ollama Cloud
+    # --------------------------------------------------------
 
     try:
         async with httpx.AsyncClient(
@@ -422,10 +597,12 @@ async def chat(
                 REQUEST_TIMEOUT_SECONDS
             )
         ) as client:
-            response = await client.post(
-                f"{OLLAMA_API_BASE}/chat",
-                headers=headers,
-                json=payload,
+            response = (
+                await client.post(
+                    f"{OLLAMA_API_BASE}/chat",
+                    headers=headers,
+                    json=payload,
+                )
             )
 
     except httpx.TimeoutException:
@@ -451,6 +628,10 @@ async def chat(
             ),
         ) from exc
 
+    # --------------------------------------------------------
+    # Ollama HTTP error
+    # --------------------------------------------------------
+
     if response.status_code >= 400:
         print(
             "Ollama HTTP error:",
@@ -466,8 +647,14 @@ async def chat(
             ),
         )
 
+    # --------------------------------------------------------
+    # Parse response
+    # --------------------------------------------------------
+
     try:
-        result = response.json()
+        result = (
+            response.json()
+        )
 
     except ValueError as exc:
         print(
@@ -483,15 +670,25 @@ async def chat(
             ),
         ) from exc
 
+    # --------------------------------------------------------
+    # Extract answer
+    # --------------------------------------------------------
+
     message = (
         result.get("message")
-        if isinstance(result, dict)
+        if isinstance(
+            result,
+            dict,
+        )
         else None
     )
 
     answer = ""
 
-    if isinstance(message, dict):
+    if isinstance(
+        message,
+        dict,
+    ):
         answer = (
             message.get(
                 "content",
@@ -506,7 +703,10 @@ async def chat(
                 "done_reason",
                 "unknown",
             )
-            if isinstance(result, dict)
+            if isinstance(
+                result,
+                dict,
+            )
             else "unknown"
         )
 
@@ -523,12 +723,28 @@ async def chat(
             ),
         )
 
+    # --------------------------------------------------------
+    # Public response
+    # --------------------------------------------------------
+
     return {
-        "answer": answer,
-        "model": OLLAMA_MODEL,
-        "provider": "Ollama Cloud",
+        "answer":
+            answer,
+
+        "model":
+            OLLAMA_MODEL,
+
+        "provider":
+            "Ollama Cloud",
+
+        "language":
+            request_body.language,
+
         "grounding": {
-            "enabled": False,
-            "type": None,
+            "enabled":
+                False,
+
+            "type":
+                None,
         },
     }
