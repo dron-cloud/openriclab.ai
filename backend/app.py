@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import time
 from collections import defaultdict, deque
@@ -8,6 +9,7 @@ from typing import Literal
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 
@@ -261,7 +263,7 @@ app = FastAPI(
         "General-purpose bilingual English/Khmer AI chat "
         "interface backed by Ollama Cloud."
     ),
-    version="6.0.0",
+    version="7.0.0",
 )
 
 
@@ -579,6 +581,166 @@ async def call_ollama(
 
 
 # ============================================================
+# Ollama streaming client
+# ============================================================
+
+async def stream_ollama(
+    messages: list[dict[str, str]],
+    *,
+    thinking=None,
+):
+    """
+    Stream Ollama message.content chunks as they are generated.
+
+    This generator talks to Ollama Cloud using NDJSON streaming.
+    It yields only public answer text. Reasoning/thinking fields
+    are never forwarded to the browser.
+    """
+
+    if thinking is None:
+        thinking = get_thinking_setting()
+
+    payload = {
+        "model":
+            OLLAMA_MODEL,
+
+        "messages":
+            messages,
+
+        "stream":
+            True,
+
+        "think":
+            thinking,
+    }
+
+    headers = {
+        "Authorization":
+            f"Bearer {OLLAMA_API_KEY}",
+
+        "Content-Type":
+            "application/json",
+
+        "Accept":
+            "application/x-ndjson",
+    }
+
+    try:
+        async with httpx.AsyncClient(
+            timeout=httpx.Timeout(
+                REQUEST_TIMEOUT_SECONDS
+            )
+        ) as client:
+
+            async with client.stream(
+                "POST",
+                f"{OLLAMA_API_BASE}/chat",
+                headers=headers,
+                json=payload,
+            ) as response:
+
+                if response.status_code >= 400:
+                    error_bytes = await response.aread()
+                    error_text = (
+                        error_bytes
+                        .decode(
+                            "utf-8",
+                            errors="replace",
+                        )[:1000]
+                    )
+
+                    print(
+                        "Ollama streaming HTTP error:",
+                        response.status_code,
+                        error_text,
+                    )
+
+                    raise RuntimeError(
+                        "The AI model service returned "
+                        "an error. Please try again."
+                    )
+
+                async for line in response.aiter_lines():
+                    if not line:
+                        continue
+
+                    try:
+                        event = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+
+                    if not isinstance(
+                        event,
+                        dict,
+                    ):
+                        continue
+
+                    message = event.get(
+                        "message"
+                    )
+
+                    if isinstance(
+                        message,
+                        dict,
+                    ):
+                        content = (
+                            message.get(
+                                "content",
+                                "",
+                            )
+                            or ""
+                        )
+
+                        if content:
+                            yield content
+
+                    if event.get("done") is True:
+                        break
+
+    except httpx.TimeoutException as exc:
+        print(
+            "Ollama streaming timeout:",
+            repr(exc),
+        )
+
+        raise RuntimeError(
+            "The AI model took too long "
+            "to respond. Please try again."
+        ) from exc
+
+    except httpx.RequestError as exc:
+        print(
+            "Ollama streaming connection error:",
+            repr(exc),
+        )
+
+        raise RuntimeError(
+            "The AI model service is "
+            "temporarily unavailable."
+        ) from exc
+
+
+def ndjson_event(
+    event_type: str,
+    **data,
+) -> str:
+    payload = {
+        "type":
+            event_type,
+
+        **data,
+    }
+
+    return (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+        )
+        + "\n"
+    )
+
+
+# ============================================================
 # Translation functions
 # ============================================================
 
@@ -657,6 +819,9 @@ async def root() -> dict:
             "km",
         ],
 
+        "streaming":
+            True,
+
         "khmer_pipeline":
             "translation-assisted",
     }
@@ -688,6 +853,9 @@ async def health() -> dict:
             "km",
         ],
 
+        "streaming":
+            True,
+
         "khmer_pipeline":
             "km->en->AI->km",
     }
@@ -697,19 +865,10 @@ async def health() -> dict:
 async def chat(
     request_body: ChatRequest,
     request: Request,
-) -> dict:
-
-    # --------------------------------------------------------
-    # Rate limit
-    # --------------------------------------------------------
-
+):
     enforce_rate_limit(
         request
     )
-
-    # --------------------------------------------------------
-    # Validate API key
-    # --------------------------------------------------------
 
     if not OLLAMA_API_KEY:
         raise HTTPException(
@@ -719,10 +878,6 @@ async def chat(
                 "configured correctly."
             ),
         )
-
-    # --------------------------------------------------------
-    # Validate user message
-    # --------------------------------------------------------
 
     user_message = (
         request_body.message
@@ -752,138 +907,197 @@ async def chat(
         f"AI Chat request language={request_body.language}"
     )
 
-    # ========================================================
-    # KHMER MODE
-    #
-    # Khmer user input
-    #     -> translate to English
-    #     -> reason / answer in English
-    #     -> translate final answer to Khmer
-    # ========================================================
-
-    if request_body.language == "km":
-
-        english_question = (
-            await translate_khmer_to_english(
-                user_message
+    async def browser_stream():
+        try:
+            # Immediate progress event: keeps the browser's idle timer alive.
+            yield ndjson_event(
+                "start",
+                language=request_body.language,
             )
-        )
 
-        print(
-            "Khmer -> English:",
-            english_question[:500],
-        )
+            # ====================================================
+            # KHMER MODE
+            # Khmer -> English -> English AI answer -> Khmer stream
+            # ====================================================
 
-        english_messages = [
-            {
-                "role":
-                    "system",
+            if request_body.language == "km":
 
-                "content":
-                    build_system_prompt(),
-            },
-            {
-                "role":
-                    "user",
+                yield ndjson_event(
+                    "status",
+                    stage="translating_question",
+                )
 
-                "content":
-                    english_question,
-            },
-        ]
+                english_question = (
+                    await translate_khmer_to_english(
+                        user_message
+                    )
+                )
 
-        english_answer = await call_ollama(
-            english_messages,
-            thinking=get_thinking_setting(),
-        )
+                print(
+                    "Khmer -> English:",
+                    english_question[:500],
+                )
 
-        khmer_answer = (
-            await translate_english_to_khmer(
-                english_answer
-            )
-        )
+                yield ndjson_event(
+                    "status",
+                    stage="reasoning",
+                )
 
-        return {
-            "answer":
-                khmer_answer,
+                english_messages = [
+                    {
+                        "role":
+                            "system",
 
-            "model":
-                OLLAMA_MODEL,
+                        "content":
+                            build_system_prompt(),
+                    },
+                    {
+                        "role":
+                            "user",
 
-            "provider":
-                "Ollama Cloud",
+                        "content":
+                            english_question,
+                    },
+                ]
 
-            "language":
-                "km",
+                english_answer = await call_ollama(
+                    english_messages,
+                    thinking=get_thinking_setting(),
+                )
 
-            "pipeline":
-                "km->en->AI->km",
+                yield ndjson_event(
+                    "status",
+                    stage="translating_answer",
+                )
 
-            "grounding": {
-                "enabled":
-                    False,
+                translation_messages = [
+                    {
+                        "role":
+                            "system",
 
-                "type":
-                    None,
-            },
-        }
+                        "content":
+                            ENGLISH_TO_KHMER_PROMPT,
+                    },
+                    {
+                        "role":
+                            "user",
 
-    # ========================================================
-    # ENGLISH MODE
-    #
-    # Preserve the existing conversation-history behavior.
-    # ========================================================
+                        "content":
+                            english_answer,
+                    },
+                ]
 
-    history = clean_history(
-        request_body.history,
-        user_message,
-    )
+                emitted = False
 
-    messages = [
-        {
-            "role":
-                "system",
+                async for chunk in stream_ollama(
+                    translation_messages,
+                    thinking=False,
+                ):
+                    emitted = True
 
-            "content":
-                build_system_prompt(),
-        },
+                    yield ndjson_event(
+                        "chunk",
+                        content=chunk,
+                    )
 
-        *history,
+                if not emitted:
+                    raise RuntimeError(
+                        "The AI model did not return "
+                        "a final Khmer answer."
+                    )
 
-        {
-            "role":
-                "user",
+                yield ndjson_event(
+                    "done",
+                    language="km",
+                    model=OLLAMA_MODEL,
+                    pipeline="km->en->AI->km",
+                )
 
-            "content":
+                return
+
+            # ====================================================
+            # ENGLISH MODE
+            # Stream the main answer immediately.
+            # ====================================================
+
+            history = clean_history(
+                request_body.history,
                 user_message,
-        },
-    ]
+            )
 
-    answer = await call_ollama(
-        messages,
-        thinking=get_thinking_setting(),
+            messages = [
+                {
+                    "role":
+                        "system",
+
+                    "content":
+                        build_system_prompt(),
+                },
+
+                *history,
+
+                {
+                    "role":
+                        "user",
+
+                    "content":
+                        user_message,
+                },
+            ]
+
+            emitted = False
+
+            async for chunk in stream_ollama(
+                messages,
+                thinking=get_thinking_setting(),
+            ):
+                emitted = True
+
+                yield ndjson_event(
+                    "chunk",
+                    content=chunk,
+                )
+
+            if not emitted:
+                raise RuntimeError(
+                    "The AI model did not return "
+                    "a final answer."
+                )
+
+            yield ndjson_event(
+                "done",
+                language="en",
+                model=OLLAMA_MODEL,
+                pipeline="direct-stream",
+            )
+
+        except Exception as exc:
+            print(
+                "AI Chat streaming error:",
+                repr(exc),
+            )
+
+            public_message = str(exc).strip()
+
+            if not public_message:
+                public_message = (
+                    "The AI service encountered an error. "
+                    "Please try again."
+                )
+
+            yield ndjson_event(
+                "error",
+                message=public_message,
+            )
+
+    return StreamingResponse(
+        browser_stream(),
+        media_type="application/x-ndjson; charset=utf-8",
+        headers={
+            "Cache-Control":
+                "no-cache, no-transform",
+
+            "X-Accel-Buffering":
+                "no",
+        },
     )
-
-    return {
-        "answer":
-            answer,
-
-        "model":
-            OLLAMA_MODEL,
-
-        "provider":
-            "Ollama Cloud",
-
-        "language":
-            "en",
-
-        "pipeline":
-            "direct",
-
-        "grounding": {
-            "enabled":
-                False,
-
-            "type":
-                None,
-        },
-    }
