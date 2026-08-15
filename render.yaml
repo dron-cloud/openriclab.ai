@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: openriclab-ai
+    name: openriclab-ai-python
     runtime: python
     rootDir: backend
 
