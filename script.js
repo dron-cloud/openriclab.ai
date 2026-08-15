@@ -269,8 +269,8 @@
   const MAX_HISTORY_MESSAGES = 8;
   const MAX_INPUT_CHARACTERS = 6000;
 
-  // Streaming uses an idle timeout rather than one absolute timer.
-  // Any backend progress event or answer chunk resets this timer.
+  // Streaming uses an idle timeout, not one absolute request timer.
+  // Every progress event or response chunk resets the timer.
   const REQUEST_IDLE_TIMEOUT_MS = 190000;
 
   let conversation = [];
@@ -575,7 +575,7 @@
   updateLanguageUI("en");
 
   // ============================================================
-  // FORM SUBMISSION — STREAMING
+  // FORM SUBMISSION — STREAMING FIRST + JSON FALLBACK
   // ============================================================
 
   if (
@@ -646,16 +646,13 @@
         });
 
         input.value = "";
-
         setBusy(true);
 
         const loadingRow =
           appendMessage(
             "assistant",
             "",
-            {
-              loading: true
-            }
+            { loading: true }
           );
 
         const controller =
@@ -663,68 +660,61 @@
 
         let idleTimeoutId = null;
 
-        const resetIdleTimeout =
-          () => {
-            if (idleTimeoutId) {
-              window.clearTimeout(
-                idleTimeoutId
-              );
-            }
+        const resetIdleTimeout = () => {
+          if (idleTimeoutId) {
+            window.clearTimeout(
+              idleTimeoutId
+            );
+          }
 
-            idleTimeoutId =
-              window.setTimeout(
-                () =>
-                  controller.abort(),
-                REQUEST_IDLE_TIMEOUT_MS
-              );
-          };
+          idleTimeoutId =
+            window.setTimeout(
+              () => controller.abort(),
+              REQUEST_IDLE_TIMEOUT_MS
+            );
+        };
 
         resetIdleTimeout();
 
         let assistantRow = null;
         let assistantBubble = null;
         let answer = "";
-        let streamBuffer = "";
 
-        const ensureAssistantBubble =
-          () => {
-            if (assistantBubble) {
-              return assistantBubble;
-            }
-
-            loadingRow?.remove();
-
-            assistantRow =
-              appendMessage(
-                "assistant",
-                ""
-              );
-
-            assistantBubble =
-              assistantRow?.querySelector(
-                ".assistant-bubble"
-              ) || null;
-
+        const ensureAssistantBubble = () => {
+          if (assistantBubble) {
             return assistantBubble;
-          };
+          }
 
-        const renderStreamingAnswer =
-          () => {
-            const bubble =
-              ensureAssistantBubble();
+          loadingRow?.remove();
 
-            if (!bubble) return;
-
-            bubble.innerHTML =
-              formatAnswer(answer);
-
-            secureLinks(
-              bubble
+          assistantRow =
+            appendMessage(
+              "assistant",
+              ""
             );
 
-            chat.scrollTop =
-              chat.scrollHeight;
-          };
+          assistantBubble =
+            assistantRow?.querySelector(
+              ".assistant-bubble"
+            ) || null;
+
+          return assistantBubble;
+        };
+
+        const renderStreamingAnswer = () => {
+          const bubble =
+            ensureAssistantBubble();
+
+          if (!bubble) return;
+
+          bubble.innerHTML =
+            formatAnswer(answer);
+
+          secureLinks(bubble);
+
+          chat.scrollTop =
+            chat.scrollHeight;
+        };
 
         const updateLoadingStage =
           stage => {
@@ -763,19 +753,170 @@
             }
           };
 
+        const handleStreamEvent =
+          eventPayload => {
+            if (
+              !eventPayload ||
+              typeof eventPayload !== "object"
+            ) {
+              return;
+            }
+
+            resetIdleTimeout();
+
+            if (
+              eventPayload.type === "start"
+            ) {
+              return;
+            }
+
+            if (
+              eventPayload.type === "status"
+            ) {
+              updateLoadingStage(
+                eventPayload.stage
+              );
+              return;
+            }
+
+            if (
+              eventPayload.type === "chunk"
+            ) {
+              const chunk =
+                String(
+                  eventPayload.content || ""
+                );
+
+              if (!chunk) return;
+
+              answer += chunk;
+              renderStreamingAnswer();
+              return;
+            }
+
+            if (
+              eventPayload.type === "error"
+            ) {
+              throw new Error(
+                eventPayload.message ||
+                  (
+                    requestLanguage === "km"
+                      ? "AI service មានបញ្ហា។ សូមសាកល្បងម្តងទៀត។"
+                      : "The AI service encountered an error. Please try again."
+                  )
+              );
+            }
+          };
+
+        const consumeNDJSON =
+          async response => {
+            if (
+              !response.body ||
+              typeof response.body.getReader !==
+                "function"
+            ) {
+              throw new Error(
+                requestLanguage === "km"
+                  ? "កម្មវិធីរុករកនេះមិនគាំទ្រ AI streaming ទេ។"
+                  : "This browser does not support AI streaming."
+              );
+            }
+
+            const reader =
+              response.body.getReader();
+
+            const decoder =
+              new TextDecoder("utf-8");
+
+            let buffer = "";
+
+            while (true) {
+              const {
+                value,
+                done
+              } = await reader.read();
+
+              if (done) break;
+
+              resetIdleTimeout();
+
+              buffer +=
+                decoder.decode(
+                  value,
+                  { stream: true }
+                );
+
+              const lines =
+                buffer.split("\n");
+
+              buffer =
+                lines.pop() || "";
+
+              for (
+                const rawLine
+                of lines
+              ) {
+                const line =
+                  rawLine.trim();
+
+                if (!line) continue;
+
+                let payload;
+
+                try {
+                  payload =
+                    JSON.parse(line);
+                } catch (parseError) {
+                  console.warn(
+                    "Skipping invalid AI stream event:",
+                    line,
+                    parseError
+                  );
+                  continue;
+                }
+
+                handleStreamEvent(payload);
+              }
+            }
+
+            buffer += decoder.decode();
+
+            const finalLine =
+              buffer.trim();
+
+            if (finalLine) {
+              try {
+                handleStreamEvent(
+                  JSON.parse(finalLine)
+                );
+              } catch (parseError) {
+                if (
+                  parseError instanceof SyntaxError
+                ) {
+                  console.warn(
+                    "Ignoring incomplete final stream event:",
+                    finalLine
+                  );
+                } else {
+                  throw parseError;
+                }
+              }
+            }
+          };
+
         try {
           const response =
             await fetch(
               API_URL,
               {
-                method:
-                  "POST",
+                method: "POST",
 
                 headers: {
                   "Content-Type":
                     "application/json",
+
                   "Accept":
-                    "application/x-ndjson"
+                    "application/x-ndjson, application/json"
                 },
 
                 body:
@@ -833,192 +974,61 @@
                   : "The AI model took too long to respond. Please try again.";
             }
 
-            throw new Error(
-              message
-            );
+            throw new Error(message);
           }
 
+          const contentType =
+            (
+              response.headers.get(
+                "content-type"
+              ) || ""
+            ).toLowerCase();
+
+          // --------------------------------------------------
+          // Preferred path: true streaming backend
+          // --------------------------------------------------
           if (
-            !response.body ||
-            typeof response.body.getReader !==
-              "function"
+            contentType.includes(
+              "application/x-ndjson"
+            ) ||
+            contentType.includes(
+              "application/ndjson"
+            )
           ) {
-            throw new Error(
-              requestLanguage === "km"
-                ? "កម្មវិធីរុករកនេះមិនគាំទ្រ AI streaming ទេ។"
-                : "This browser does not support AI streaming."
+            await consumeNDJSON(
+              response
             );
           }
 
-          const reader =
-            response.body.getReader();
+          // --------------------------------------------------
+          // Compatibility fallback: older JSON backend
+          // --------------------------------------------------
+          else {
+            const payload =
+              await response.json();
 
-          const decoder =
-            new TextDecoder(
-              "utf-8"
-            );
+            const fallbackAnswer =
+              String(
+                payload.answer ||
+                payload.message ||
+                ""
+              ).trim();
 
-          let streamDone = false;
-
-          while (!streamDone) {
-            const {
-              value,
-              done
-            } = await reader.read();
-
-            if (done) {
-              break;
-            }
-
-            resetIdleTimeout();
-
-            streamBuffer +=
-              decoder.decode(
-                value,
-                {
-                  stream: true
-                }
+            if (!fallbackAnswer) {
+              throw new Error(
+                requestLanguage === "km"
+                  ? "AI មិនបានផ្តល់ចម្លើយទេ។"
+                  : "The AI model returned an empty response."
               );
-
-            const lines =
-              streamBuffer.split(
-                "\n"
-              );
-
-            streamBuffer =
-              lines.pop() || "";
-
-            for (
-              const rawLine
-              of lines
-            ) {
-              const line =
-                rawLine.trim();
-
-              if (!line) continue;
-
-              let eventPayload;
-
-              try {
-                eventPayload =
-                  JSON.parse(line);
-              } catch (parseError) {
-                console.warn(
-                  "Invalid AI stream event:",
-                  line,
-                  parseError
-                );
-
-                continue;
-              }
-
-              resetIdleTimeout();
-
-              if (
-                eventPayload.type ===
-                "status"
-              ) {
-                updateLoadingStage(
-                  eventPayload.stage
-                );
-
-                continue;
-              }
-
-              if (
-                eventPayload.type ===
-                "chunk"
-              ) {
-                const chunk =
-                  String(
-                    eventPayload.content ||
-                    ""
-                  );
-
-                if (!chunk) {
-                  continue;
-                }
-
-                answer += chunk;
-
-                renderStreamingAnswer();
-
-                continue;
-              }
-
-              if (
-                eventPayload.type ===
-                "error"
-              ) {
-                throw new Error(
-                  eventPayload.message ||
-                    (
-                      requestLanguage === "km"
-                        ? "AI service មានបញ្ហា។ សូមសាកល្បងម្តងទៀត។"
-                        : "The AI service encountered an error. Please try again."
-                    )
-                );
-              }
-
-              if (
-                eventPayload.type ===
-                "done"
-              ) {
-                streamDone = true;
-              }
             }
-          }
 
-          streamBuffer +=
-            decoder.decode();
+            answer =
+              fallbackAnswer;
 
-          if (
-            streamBuffer.trim()
-          ) {
-            try {
-              const finalEvent =
-                JSON.parse(
-                  streamBuffer.trim()
-                );
-
-              if (
-                finalEvent.type ===
-                  "chunk"
-              ) {
-                answer +=
-                  String(
-                    finalEvent.content ||
-                    ""
-                  );
-
-                renderStreamingAnswer();
-              } else if (
-                finalEvent.type ===
-                  "error"
-              ) {
-                throw new Error(
-                  finalEvent.message ||
-                    "The AI service encountered an error."
-                );
-              }
-            } catch (parseError) {
-              if (
-                parseError instanceof
-                  SyntaxError
-              ) {
-                console.warn(
-                  "Incomplete final AI stream event:",
-                  streamBuffer
-                );
-              } else {
-                throw parseError;
-              }
-            }
+            renderStreamingAnswer();
           }
 
           if (!answer.trim()) {
-            loadingRow?.remove();
-
             throw new Error(
               requestLanguage === "km"
                 ? "AI មិនបានផ្តល់ចម្លើយទេ។"
@@ -1027,11 +1037,8 @@
           }
 
           conversation.push({
-            role:
-              "assistant",
-
-            content:
-              answer
+            role: "assistant",
+            content: answer
           });
 
           if (
@@ -1045,13 +1052,12 @@
           }
         } catch (error) {
           loadingRow?.remove();
+          assistantRow?.remove();
 
           console.error(
             "AI Chat error:",
             error
           );
-
-          assistantRow?.remove();
 
           let message =
             requestLanguage === "km"
@@ -1060,8 +1066,7 @@
 
           if (
             error &&
-            error.name ===
-              "AbortError"
+            error.name === "AbortError"
           ) {
             message =
               requestLanguage === "km"
@@ -1095,10 +1100,7 @@
             );
           }
 
-          setBusy(
-            false
-          );
-
+          setBusy(false);
           input.focus();
         }
       }
