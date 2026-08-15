@@ -206,6 +206,27 @@
       </div>
     </section>
 
+
+<!-- Language selector -->
+<div class="chat-language-selector" aria-label="Select chat language">
+  <button
+    type="button"
+    class="language-button active"
+    data-language="en"
+    aria-pressed="true">
+    English
+  </button>
+
+  <button
+    type="button"
+    class="language-button"
+    data-language="km"
+    aria-pressed="false">
+    ខ្មែរ
+  </button>
+</div>
+
+
 <!-- AI Chat -->
 <section class="section copilot-section" id="wireless-copilot">
 
@@ -214,6 +235,7 @@
     <div class="section-heading heading-wide reveal">
       <div>
         <span class="section-kicker">Public AI Assistant</span>
+
         <h2>
           AI Chat: a general-purpose AI assistant.
         </h2>
@@ -221,7 +243,11 @@
 
       <p>
         A public general-purpose AI assistant for questions across
-        <strong>science, engineering, mathematics, programming, artificial intelligence, writing, research, education, and everyday problem solving</strong>.
+        <strong>
+          science, engineering, mathematics, programming,
+          artificial intelligence, writing, research, education,
+          and everyday problem solving
+        </strong>.
       </p>
     </div>
 
@@ -230,12 +256,14 @@
 
       <article
         class="copilot-demo reveal copilot-demo-full"
-        aria-label="AI Chat">
+        aria-label="AI Chat"
+      >
 
+        <!-- Chat header -->
         <div class="copilot-window-top">
 
           <div class="copilot-brand">
-            <span class="copilot-logo">W</span>
+            <span class="copilot-logo">AI</span>
 
             <div>
               <strong>AI Chat</strong>
@@ -250,14 +278,45 @@
         </div>
 
 
+        <!-- Language selector -->
+        <div
+          class="chat-language-selector"
+          aria-label="Select chat language"
+        >
+
+          <button
+            type="button"
+            class="language-button active"
+            data-language="en"
+            aria-pressed="true"
+          >
+            English
+          </button>
+
+          <button
+            type="button"
+            class="language-button"
+            data-language="km"
+            aria-pressed="false"
+          >
+            ខ្មែរ
+          </button>
+
+        </div>
+
+
+        <!-- Chat window -->
         <div
           class="chat-preview"
           id="copilot-chat"
-          aria-live="polite">
+          aria-live="polite"
+        >
 
           <div class="chat-row assistant-row">
 
-            <div class="chat-avatar">AI</div>
+            <div class="chat-avatar">
+              AI
+            </div>
 
             <div class="chat-bubble assistant-bubble">
               <p>
@@ -269,13 +328,17 @@
 
         </div>
 
+
+        <!-- Chat input -->
         <form
           class="copilot-input-row"
-          id="copilot-preview-form">
+          id="copilot-preview-form"
+        >
 
           <label
             class="sr-only"
-            for="copilot-preview-input">
+            for="copilot-preview-input"
+          >
             Ask a question
           </label>
 
@@ -284,12 +347,14 @@
             type="text"
             placeholder="Start Chatting..."
             autocomplete="off"
+            maxlength="6000"
           />
 
           <button
             type="submit"
             id="copilot-submit"
-            aria-label="Ask AI Chat">
+            aria-label="Ask AI Chat"
+          >
             Ask
           </button>
 

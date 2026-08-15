@@ -183,6 +183,10 @@
   const input = document.getElementById("copilot-preview-input");
   const submit = document.getElementById("copilot-submit");
 
+  const languageButtons = [
+    ...document.querySelectorAll(".language-button")
+  ];
+
   const apiMeta = document.querySelector(
     'meta[name="wirelessai-api-url"]'
   );
@@ -199,6 +203,50 @@
 
   let conversation = [];
   let busy = false;
+  let selectedLanguage = "en";
+
+  // ------------------------------------------------------------
+  // Language selector
+  // ------------------------------------------------------------
+
+  const updateLanguageUI = language => {
+    selectedLanguage =
+      language === "km"
+        ? "km"
+        : "en";
+
+    languageButtons.forEach(button => {
+      const isActive =
+        button.dataset.language === selectedLanguage;
+
+      button.classList.toggle(
+        "active",
+        isActive
+      );
+
+      button.setAttribute(
+        "aria-pressed",
+        String(isActive)
+      );
+    });
+
+    if (input) {
+      input.placeholder =
+        selectedLanguage === "km"
+          ? "សូមសួរសំណួររបស់អ្នក..."
+          : "Start Chatting...";
+    }
+
+    input?.focus();
+  };
+
+  languageButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      updateLanguageUI(
+        button.dataset.language
+      );
+    });
+  });
 
   // ------------------------------------------------------------
   // Safe answer formatting
@@ -228,18 +276,25 @@
 
         return window.DOMPurify.sanitize(rendered);
       } catch (error) {
-        console.warn("Markdown rendering failed:", error);
+        console.warn(
+          "Markdown rendering failed:",
+          error
+        );
       }
     }
 
-    return escapeHTML(text).replace(/\n/g, "<br>");
+    return escapeHTML(text).replace(
+      /\n/g,
+      "<br>"
+    );
   };
 
   const secureLinks = container => {
     if (!container) return;
 
     container.querySelectorAll("a").forEach(link => {
-      const href = link.getAttribute("href") || "";
+      const href =
+        link.getAttribute("href") || "";
 
       if (
         href.startsWith("https://") ||
@@ -263,6 +318,7 @@
     if (!chat) return null;
 
     const row = document.createElement("div");
+
     row.className = `chat-row ${
       role === "user"
         ? "user-row"
@@ -270,13 +326,23 @@
     }`;
 
     if (role === "assistant") {
-      const avatar = document.createElement("div");
-      avatar.className = "chat-avatar";
-      avatar.textContent = "AI";
-      row.appendChild(avatar);
+      const avatar =
+        document.createElement("div");
+
+      avatar.className =
+        "chat-avatar";
+
+      avatar.textContent =
+        "AI";
+
+      row.appendChild(
+        avatar
+      );
     }
 
-    const bubble = document.createElement("div");
+    const bubble =
+      document.createElement("div");
+
     bubble.className = `chat-bubble ${
       role === "user"
         ? "user-bubble"
@@ -284,19 +350,38 @@
     }`;
 
     if (loading) {
-      bubble.classList.add("chat-loading");
-      bubble.textContent = "Thinking…";
-    } else if (role === "assistant") {
-      bubble.innerHTML = formatAnswer(text);
-      secureLinks(bubble);
+      bubble.classList.add(
+        "chat-loading"
+      );
+
+      bubble.textContent =
+        selectedLanguage === "km"
+          ? "កំពុងគិត..."
+          : "Thinking…";
+    } else if (
+      role === "assistant"
+    ) {
+      bubble.innerHTML =
+        formatAnswer(text);
+
+      secureLinks(
+        bubble
+      );
     } else {
-      bubble.textContent = text;
+      bubble.textContent =
+        text;
     }
 
-    row.appendChild(bubble);
-    chat.appendChild(row);
+    row.appendChild(
+      bubble
+    );
 
-    chat.scrollTop = chat.scrollHeight;
+    chat.appendChild(
+      row
+    );
+
+    chat.scrollTop =
+      chat.scrollHeight;
 
     return row;
   };
@@ -309,15 +394,31 @@
     busy = state;
 
     if (submit) {
-      submit.disabled = state;
-      submit.textContent = state
-        ? "Thinking…"
-        : "Ask";
+      submit.disabled =
+        state;
+
+      submit.textContent =
+        state
+          ? (
+              selectedLanguage === "km"
+                ? "កំពុងគិត..."
+                : "Thinking…"
+            )
+          : (
+              selectedLanguage === "km"
+                ? "សួរ"
+                : "Ask"
+            );
     }
 
     if (input) {
-      input.disabled = state;
+      input.disabled =
+        state;
     }
+
+    languageButtons.forEach(button => {
+      button.disabled = state;
+    });
   };
 
   // ------------------------------------------------------------
@@ -325,217 +426,307 @@
   // ------------------------------------------------------------
 
   if (input) {
-    input.maxLength = MAX_INPUT_CHARACTERS;
+    input.maxLength =
+      MAX_INPUT_CHARACTERS;
   }
+
+  updateLanguageUI("en");
 
   // ------------------------------------------------------------
   // Submit question
   // ------------------------------------------------------------
 
-  if (form && input && chat) {
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
+  if (
+    form &&
+    input &&
+    chat
+  ) {
+    form.addEventListener(
+      "submit",
+      async event => {
+        event.preventDefault();
 
-      if (busy) return;
+        if (busy) return;
 
-      const question = input.value.trim();
+        const question =
+          input.value.trim();
 
-      if (!question) {
-        input.focus();
-        return;
-      }
-
-      if (!API_URL) {
-        appendMessage("user", question);
-        appendMessage(
-          "assistant",
-          "The AI backend URL is not configured."
-        );
-        return;
-      }
-
-      const historyForRequest = conversation.slice(
-        -MAX_HISTORY_MESSAGES
-      );
-
-      appendMessage("user", question);
-
-      conversation.push({
-        role: "user",
-        content: question
-      });
-
-      input.value = "";
-      setBusy(true);
-
-      const loadingRow = appendMessage(
-        "assistant",
-        "",
-        { loading: true }
-      );
-
-      const controller = new AbortController();
-
-      const timeoutId = window.setTimeout(
-        () => controller.abort(),
-        REQUEST_TIMEOUT_MS
-      );
-
-      try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: question,
-            history: historyForRequest
-          }),
-          signal: controller.signal
-        });
-
-        const payload = await response
-          .json()
-          .catch(() => ({}));
-
-        if (!response.ok) {
-          let message =
-            payload.detail ||
-            payload.error ||
-            `HTTP ${response.status}`;
-
-          if (response.status === 429) {
-            message =
-              "Too many requests. Please wait a few minutes and try again.";
-          } else if (response.status === 413) {
-            message =
-              "Your message is too long.";
-          } else if (response.status === 504) {
-            message =
-              "The AI model took too long to respond. Please try again.";
-          }
-
-          throw new Error(message);
+        if (!question) {
+          input.focus();
+          return;
         }
 
-        const answer = String(
-          payload.answer ||
-          payload.message ||
-          ""
-        ).trim();
-
-        if (!answer) {
-          throw new Error(
-            "The AI model returned an empty response."
+        if (!API_URL) {
+          appendMessage(
+            "user",
+            question
           );
+
+          appendMessage(
+            "assistant",
+            selectedLanguage === "km"
+              ? "AI backend មិនទាន់ត្រូវបានកំណត់ទេ។"
+              : "The AI backend URL is not configured."
+          );
+
+          return;
         }
 
-        loadingRow?.remove();
+        const historyForRequest =
+          conversation.slice(
+            -MAX_HISTORY_MESSAGES
+          );
 
         appendMessage(
-          "assistant",
-          answer
+          "user",
+          question
         );
 
         conversation.push({
-          role: "assistant",
-          content: answer
+          role: "user",
+          content: question
         });
 
-        if (
-          conversation.length >
-          MAX_HISTORY_MESSAGES
-        ) {
-          conversation = conversation.slice(
-            -MAX_HISTORY_MESSAGES
+        input.value = "";
+        setBusy(true);
+
+        const loadingRow =
+          appendMessage(
+            "assistant",
+            "",
+            {
+              loading: true
+            }
           );
+
+        const controller =
+          new AbortController();
+
+        const timeoutId =
+          window.setTimeout(
+            () => controller.abort(),
+            REQUEST_TIMEOUT_MS
+          );
+
+        try {
+          const response =
+            await fetch(
+              API_URL,
+              {
+                method:
+                  "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    message:
+                      question,
+
+                    history:
+                      historyForRequest,
+
+                    language:
+                      selectedLanguage
+                  }),
+
+                signal:
+                  controller.signal
+              }
+            );
+
+          const payload =
+            await response
+              .json()
+              .catch(
+                () => ({})
+              );
+
+          if (!response.ok) {
+            let message =
+              payload.detail ||
+              payload.error ||
+              `HTTP ${response.status}`;
+
+            if (
+              response.status ===
+              429
+            ) {
+              message =
+                selectedLanguage === "km"
+                  ? "មានសំណើច្រើនពេក។ សូមរង់ចាំបន្តិច ហើយសាកល្បងម្តងទៀត។"
+                  : "Too many requests. Please wait a few minutes and try again.";
+            } else if (
+              response.status ===
+              413
+            ) {
+              message =
+                selectedLanguage === "km"
+                  ? "សាររបស់អ្នកវែងពេក។"
+                  : "Your message is too long.";
+            } else if (
+              response.status ===
+              504
+            ) {
+              message =
+                selectedLanguage === "km"
+                  ? "AI ចំណាយពេលយូរពេកក្នុងការឆ្លើយតប។ សូមសាកល្បងម្តងទៀត។"
+                  : "The AI model took too long to respond. Please try again.";
+            }
+
+            throw new Error(
+              message
+            );
+          }
+
+          const answer =
+            String(
+              payload.answer ||
+              payload.message ||
+              ""
+            ).trim();
+
+          if (!answer) {
+            throw new Error(
+              selectedLanguage === "km"
+                ? "AI មិនបានផ្តល់ចម្លើយទេ។"
+                : "The AI model returned an empty response."
+            );
+          }
+
+          loadingRow?.remove();
+
+          appendMessage(
+            "assistant",
+            answer
+          );
+
+          conversation.push({
+            role:
+              "assistant",
+
+            content:
+              answer
+          });
+
+          if (
+            conversation.length >
+            MAX_HISTORY_MESSAGES
+          ) {
+            conversation =
+              conversation.slice(
+                -MAX_HISTORY_MESSAGES
+              );
+          }
+        } catch (error) {
+          loadingRow?.remove();
+
+          console.error(
+            "AI Chat error:",
+            error
+          );
+
+          let message =
+            selectedLanguage === "km"
+              ? "មិនអាចភ្ជាប់ទៅ AI backend បានទេ។"
+              : "I could not reach the AI backend.";
+
+          if (
+            error &&
+            error.name ===
+            "AbortError"
+          ) {
+            message =
+              selectedLanguage === "km"
+                ? "សំណើបានផុតកំណត់ពេល។ សូមសាកល្បងម្តងទៀត។"
+                : "The request timed out. Please try again.";
+          } else if (
+            error &&
+            error.message
+          ) {
+            message =
+              error.message;
+          }
+
+          appendMessage(
+            "assistant",
+            message
+          );
+
+          // Remove unanswered user message from local history.
+          if (
+            conversation.length &&
+            conversation[
+              conversation.length - 1
+            ].role === "user"
+          ) {
+            conversation.pop();
+          }
+        } finally {
+          window.clearTimeout(
+            timeoutId
+          );
+
+          setBusy(
+            false
+          );
+
+          input.focus();
         }
-      } catch (error) {
-        loadingRow?.remove();
-
-        console.error(
-          "AI Chat error:",
-          error
-        );
-
-        let message =
-          "I could not reach the AI backend.";
-
-        if (
-          error &&
-          error.name === "AbortError"
-        ) {
-          message =
-            "The request timed out. Please try again.";
-        } else if (
-          error &&
-          error.message
-        ) {
-          message = error.message;
-        }
-
-        appendMessage(
-          "assistant",
-          message
-        );
-
-        // Remove unanswered user message from local history.
-        if (
-          conversation.length &&
-          conversation[
-            conversation.length - 1
-          ].role === "user"
-        ) {
-          conversation.pop();
-        }
-      } finally {
-        window.clearTimeout(timeoutId);
-        setBusy(false);
-        input.focus();
       }
-    });
+    );
   }
 
   // ============================================================
   // OPTIONAL BACKEND HEALTH CHECK
   // ============================================================
 
-  const checkBackendHealth = async () => {
-    if (!API_URL) return;
+  const checkBackendHealth =
+    async () => {
+      if (!API_URL) return;
 
-    const healthURL = API_URL.replace(
-      /\/api\/chat\/?$/,
-      "/api/health"
-    );
+      const healthURL =
+        API_URL.replace(
+          /\/api\/chat\/?$/,
+          "/api/health"
+        );
 
-    try {
-      const response = await fetch(
-        healthURL,
-        {
-          method: "GET",
-          cache: "no-store"
+      try {
+        const response =
+          await fetch(
+            healthURL,
+            {
+              method:
+                "GET",
+
+              cache:
+                "no-store"
+            }
+          );
+
+        if (!response.ok) {
+          throw new Error(
+            `HTTP ${response.status}`
+          );
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(
-          `HTTP ${response.status}`
+        const payload =
+          await response.json();
+
+        console.info(
+          "AI Chat backend:",
+          payload
+        );
+      } catch (error) {
+        console.warn(
+          "AI Chat health check failed:",
+          error
         );
       }
-
-      const payload = await response.json();
-
-      console.info(
-        "AI Chat backend:",
-        payload
-      );
-    } catch (error) {
-      console.warn(
-        "AI Chat health check failed:",
-        error
-      );
-    }
-  };
+    };
 
   checkBackendHealth();
 })();
