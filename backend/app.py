@@ -263,7 +263,7 @@ app = FastAPI(
         "General-purpose bilingual English/Khmer AI chat "
         "interface backed by Ollama Cloud."
     ),
-    version="7.0.0",
+    version="7.1.0",
 )
 
 
@@ -361,6 +361,32 @@ def get_thinking_setting():
     return False
 
 
+def normalize_thinking_setting(
+    thinking=None,
+):
+    """
+    GPT-OSS expects low/medium/high rather than a boolean.
+    For translation calls, False is normalized to low so the
+    request remains valid for GPT-OSS while minimizing reasoning.
+    """
+    if OLLAMA_MODEL.lower().startswith(
+        "gpt-oss"
+    ):
+        if thinking in {
+            "low",
+            "medium",
+            "high",
+        }:
+            return thinking
+
+        return "low"
+
+    if thinking is None:
+        return False
+
+    return bool(thinking)
+
+
 def build_system_prompt() -> str:
     return (
         SYSTEM_PROMPT
@@ -425,8 +451,9 @@ async def call_ollama(
     thinking=None,
 ) -> str:
 
-    if thinking is None:
-        thinking = get_thinking_setting()
+    thinking = normalize_thinking_setting(
+        thinking
+    )
 
     payload = {
         "model":
@@ -584,21 +611,24 @@ async def call_ollama(
 # Ollama streaming client
 # ============================================================
 
-async def stream_ollama(
+async def stream_ollama_events(
     messages: list[dict[str, str]],
     *,
     thinking=None,
 ):
     """
-    Stream Ollama message.content chunks as they are generated.
+    Stream Ollama chat events.
 
-    This generator talks to Ollama Cloud using NDJSON streaming.
-    It yields only public answer text. Reasoning/thinking fields
-    are never forwarded to the browser.
+    Yields:
+      ("thinking", "") for hidden reasoning/progress chunks
+      ("content", "<text>") for visible answer chunks
+
+    Thinking content is intentionally never exposed to the browser.
     """
 
-    if thinking is None:
-        thinking = get_thinking_setting()
+    thinking = normalize_thinking_setting(
+        thinking
+    )
 
     payload = {
         "model":
@@ -640,10 +670,12 @@ async def stream_ollama(
             ) as response:
 
                 if response.status_code >= 400:
-                    error_bytes = await response.aread()
+                    error_bytes = (
+                        await response.aread()
+                    )
+
                     error_text = (
-                        error_bytes
-                        .decode(
+                        error_bytes.decode(
                             "utf-8",
                             errors="replace",
                         )[:1000]
@@ -665,8 +697,15 @@ async def stream_ollama(
                         continue
 
                     try:
-                        event = json.loads(line)
+                        event = json.loads(
+                            line
+                        )
                     except json.JSONDecodeError:
+                        print(
+                            "Skipping invalid Ollama "
+                            "stream line:",
+                            line[:500],
+                        )
                         continue
 
                     if not isinstance(
@@ -683,6 +722,22 @@ async def stream_ollama(
                         message,
                         dict,
                     ):
+                        thinking_chunk = (
+                            message.get(
+                                "thinking",
+                                "",
+                            )
+                            or ""
+                        )
+
+                        if thinking_chunk:
+                            # Signal progress without exposing
+                            # private reasoning content.
+                            yield (
+                                "thinking",
+                                "",
+                            )
+
                         content = (
                             message.get(
                                 "content",
@@ -692,9 +747,14 @@ async def stream_ollama(
                         )
 
                         if content:
-                            yield content
+                            yield (
+                                "content",
+                                content,
+                            )
 
-                    if event.get("done") is True:
+                    if event.get(
+                        "done"
+                    ) is True:
                         break
 
     except httpx.TimeoutException as exc:
@@ -724,16 +784,14 @@ def ndjson_event(
     event_type: str,
     **data,
 ) -> str:
-    payload = {
-        "type":
-            event_type,
-
-        **data,
-    }
-
     return (
         json.dumps(
-            payload,
+            {
+                "type":
+                    event_type,
+
+                **data,
+            },
             ensure_ascii=False,
         )
         + "\n"
@@ -822,6 +880,9 @@ async def root() -> dict:
         "streaming":
             True,
 
+        "stream_format":
+            "ndjson",
+
         "khmer_pipeline":
             "translation-assisted",
     }
@@ -856,6 +917,9 @@ async def health() -> dict:
         "streaming":
             True,
 
+        "stream_format":
+            "ndjson",
+
         "khmer_pipeline":
             "km->en->AI->km",
     }
@@ -866,6 +930,10 @@ async def chat(
     request_body: ChatRequest,
     request: Request,
 ):
+    # --------------------------------------------------------
+    # Validate before StreamingResponse starts
+    # --------------------------------------------------------
+
     enforce_rate_limit(
         request
     )
@@ -904,12 +972,18 @@ async def chat(
         )
 
     print(
-        f"AI Chat request language={request_body.language}"
+        f"AI Chat request language="
+        f"{request_body.language}"
     )
+
+    # --------------------------------------------------------
+    # Browser-facing NDJSON generator
+    # --------------------------------------------------------
 
     async def browser_stream():
         try:
-            # Immediate progress event: keeps the browser's idle timer alive.
+            # Immediately flush one event so the browser knows
+            # that the streaming connection is established.
             yield ndjson_event(
                 "start",
                 language=request_body.language,
@@ -917,7 +991,10 @@ async def chat(
 
             # ====================================================
             # KHMER MODE
-            # Khmer -> English -> English AI answer -> Khmer stream
+            #
+            # 1. Khmer -> English (non-streaming, short stage)
+            # 2. Main AI reasoning in English (non-streaming)
+            # 3. English -> Khmer (STREAMED to browser)
             # ====================================================
 
             if request_body.language == "km":
@@ -960,9 +1037,11 @@ async def chat(
                     },
                 ]
 
-                english_answer = await call_ollama(
-                    english_messages,
-                    thinking=get_thinking_setting(),
+                english_answer = (
+                    await call_ollama(
+                        english_messages,
+                        thinking=get_thinking_setting(),
+                    )
                 )
 
                 yield ndjson_event(
@@ -987,23 +1066,42 @@ async def chat(
                     },
                 ]
 
-                emitted = False
+                content_seen = False
 
-                async for chunk in stream_ollama(
+                async for (
+                    event_type,
+                    content,
+                ) in stream_ollama_events(
                     translation_messages,
-                    thinking=False,
+                    thinking="low",
                 ):
-                    emitted = True
+                    if (
+                        event_type ==
+                        "thinking"
+                    ):
+                        # Hidden reasoning heartbeat.
+                        yield ndjson_event(
+                            "status",
+                            stage="translating_answer",
+                        )
+                        continue
 
-                    yield ndjson_event(
-                        "chunk",
-                        content=chunk,
-                    )
+                    if (
+                        event_type ==
+                        "content"
+                        and content
+                    ):
+                        content_seen = True
 
-                if not emitted:
+                        yield ndjson_event(
+                            "chunk",
+                            content=content,
+                        )
+
+                if not content_seen:
                     raise RuntimeError(
-                        "The AI model did not return "
-                        "a final Khmer answer."
+                        "The AI model returned "
+                        "an empty Khmer response."
                     )
 
                 yield ndjson_event(
@@ -1017,7 +1115,10 @@ async def chat(
 
             # ====================================================
             # ENGLISH MODE
-            # Stream the main answer immediately.
+            #
+            # Stream visible answer chunks immediately.
+            # Hidden reasoning chunks become heartbeat/status
+            # events so the frontend's idle timeout stays alive.
             # ====================================================
 
             history = clean_history(
@@ -1045,23 +1146,48 @@ async def chat(
                 },
             ]
 
-            emitted = False
+            content_seen = False
 
-            async for chunk in stream_ollama(
+            yield ndjson_event(
+                "status",
+                stage="reasoning",
+            )
+
+            async for (
+                event_type,
+                content,
+            ) in stream_ollama_events(
                 messages,
                 thinking=get_thinking_setting(),
             ):
-                emitted = True
+                if (
+                    event_type ==
+                    "thinking"
+                ):
+                    # Do not expose the reasoning text.
+                    # This event only keeps the stream active.
+                    yield ndjson_event(
+                        "status",
+                        stage="reasoning",
+                    )
+                    continue
 
-                yield ndjson_event(
-                    "chunk",
-                    content=chunk,
-                )
+                if (
+                    event_type ==
+                    "content"
+                    and content
+                ):
+                    content_seen = True
 
-            if not emitted:
+                    yield ndjson_event(
+                        "chunk",
+                        content=content,
+                    )
+
+            if not content_seen:
                 raise RuntimeError(
-                    "The AI model did not return "
-                    "a final answer."
+                    "The AI model returned "
+                    "an empty response."
                 )
 
             yield ndjson_event(
@@ -1077,12 +1203,14 @@ async def chat(
                 repr(exc),
             )
 
-            public_message = str(exc).strip()
+            public_message = str(
+                exc
+            ).strip()
 
             if not public_message:
                 public_message = (
-                    "The AI service encountered an error. "
-                    "Please try again."
+                    "The AI service encountered "
+                    "an error. Please try again."
                 )
 
             yield ndjson_event(
@@ -1092,12 +1220,21 @@ async def chat(
 
     return StreamingResponse(
         browser_stream(),
-        media_type="application/x-ndjson; charset=utf-8",
+        media_type=(
+            "application/x-ndjson; "
+            "charset=utf-8"
+        ),
         headers={
+            # Prevent browser/proxy caching or transformation.
             "Cache-Control":
                 "no-cache, no-transform",
 
+            # Helpful for reverse proxies that honor this header.
             "X-Accel-Buffering":
                 "no",
+
+            # Make the streaming content type explicit.
+            "Content-Type":
+                "application/x-ndjson; charset=utf-8",
         },
     )
