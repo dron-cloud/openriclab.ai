@@ -33,7 +33,7 @@ OLLAMA_API_KEY = os.getenv(
 REQUEST_TIMEOUT_SECONDS = float(
     os.getenv(
         "REQUEST_TIMEOUT_SECONDS",
-        "300",
+        "180",
     )
 )
 
@@ -161,47 +161,47 @@ You are a conversational assistant for general-purpose use.
 
 
 KHMER_LANGUAGE_INSTRUCTIONS = """
-Respond primarily in natural, clear Khmer (ភាសាខ្មែរ).
+The user has explicitly selected Khmer mode.
 
-Language rules:
+LANGUAGE REQUIREMENT:
+- Your response MUST be primarily in Khmer (ភាសាខ្មែរ).
+- Do not answer primarily in English.
+- Do not switch to English just because the topic is technical.
+- Section headings should normally be in Khmer.
+- Explanatory sentences should be written in natural, readable Khmer.
 
-1. Use Khmer-first explanations.
-2. For technical, scientific, engineering, computing, medical, business,
-   or academic terms, include the commonly used English term in parentheses
-   when helpful.
-3. Do not force literal Khmer translations when they sound unnatural,
-   ambiguous, uncommon, or technically inaccurate.
-4. Keep widely recognized acronyms, standards, software names, programming
-   languages, equations, model names, and protocol names in their original form.
-5. Preserve technical notation such as AI, LLM, GPU, CPU, API, Python, 5G, 6G,
-   O-RAN, AI-RAN, Wi-Fi, TCP/IP, HTTP, JSON, SQL, and similar terms.
-6. Preserve equations, mathematical symbols, variable names, code, units,
-   standards identifiers, and file names when appropriate.
-7. If a technical concept does not have a clear established Khmer term,
-   explain the concept naturally in Khmer and retain the English term.
-8. Avoid awkward word-for-word translation from English into Khmer.
-9. For beginner questions, use simple and accessible Khmer.
-10. For advanced technical questions, keep precise English terminology alongside
-    the Khmer explanation.
-11. If the user explicitly asks for English only, answer in English.
-12. If the user mixes Khmer and English, respond naturally in Khmer while
-    preserving useful English technical terminology.
+TECHNICAL TERMINOLOGY:
+- Use Khmer-first explanations.
+- Keep important English technical terms in parentheses when useful.
+- Preserve established acronyms, standards names, protocol names, software names,
+  programming languages, equations, model names, and technical identifiers.
+- Examples:
+  - បញ្ញាសិប្បនិម្មិត (Artificial Intelligence)
+  - ការរៀនម៉ាស៊ីន (Machine Learning)
+  - បណ្តាញសរសៃប្រសាទ (Neural Network)
+  - គំរូភាសាខ្នាតធំ (Large Language Model: LLM)
+  - បណ្តាញឥតខ្សែ (Wireless Network)
+  - ផ្កាយរណបគន្លងទាប (Low-Earth-Orbit Satellite: LEO)
+- Preserve terms such as AI, LLM, GPU, CPU, API, Python, 5G, 6G, O-RAN,
+  AI-RAN, O-RU, O-DU, O-CU, Near-RT RIC, E2, A1, Wi-Fi, TCP/IP, HTTP,
+  JSON, and SQL in their established form where appropriate.
+- Do not force literal Khmer translations if they are awkward, uncommon,
+  ambiguous, or technically inaccurate.
+- If there is no clear Khmer technical term, explain the idea naturally in Khmer
+  and retain the English technical term.
 
-Examples of preferred style:
+STYLE:
+- For beginner questions, use simple Khmer.
+- For advanced technical questions, keep precise English terminology alongside
+  Khmer explanations.
+- If the user mixes Khmer and English, respond naturally in Khmer while preserving
+  useful English technical terminology.
+- If the user explicitly asks for English, English is allowed.
 
-- បញ្ញាសិប្បនិម្មិត (Artificial Intelligence)
-- ការរៀនម៉ាស៊ីន (Machine Learning)
-- បណ្តាញសរសៃប្រសាទ (Neural Network)
-- គំរូភាសាខ្នាតធំ (Large Language Model: LLM)
-- កុំព្យូទ័រពពក (Cloud Computing)
-- បណ្តាញឥតខ្សែ (Wireless Network)
-- ផ្កាយរណបគន្លងទាប (Low-Earth-Orbit Satellite: LEO)
-
-Accuracy rules:
-
-- Never fabricate facts, citations, standards, references, or quotations.
-- If uncertain about a Khmer translation, prefer the established English
-  technical term with a clear Khmer explanation instead of inventing a translation.
+ACCURACY:
+- Never fabricate facts, citations, standards, references, clauses, or quotations.
+- If uncertain about a Khmer translation, prefer the established English technical
+  term with a clear Khmer explanation rather than inventing a translation.
 """.strip()
 
 
@@ -222,20 +222,9 @@ class HistoryMessage(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    message: str = Field(
-        min_length=1,
-        max_length=12000,
-    )
-
-    history: list[HistoryMessage] = Field(
-        default_factory=list,
-        max_length=12,
-    )
-
-    language: Literal[
-        "en",
-        "km",
-    ] = "en"
+    message: str = Field(min_length=1, max_length=MAX_USER_CHARACTERS)
+    history: list[HistoryMessage] = Field(default_factory=list)
+    language: Literal["en", "km"] = "en"
 
 
 # ============================================================
@@ -365,6 +354,21 @@ def build_system_prompt(
         )
     )
 
+
+def prepare_user_message(
+    message: str,
+    language: str,
+) -> str:
+    if language != "km":
+        return message
+
+    return (
+        "សូមឆ្លើយសំណួរខាងក្រោមជាភាសាខ្មែរ។ "
+        "សូមពន្យល់ជាភាសាខ្មែរជាចម្បង ហើយរក្សាពាក្យបច្ចេកទេសសំខាន់ៗ "
+        "ជាភាសាអង់គ្លេសក្នុងវង់ក្រចក នៅពេលវាជួយឱ្យអត្ថន័យច្បាស់។ "
+        "កុំឆ្លើយជាភាសាអង់គ្លេសជាចម្បង។\n\n"
+        + message
+    )
 
 def clean_history(
     history: list[HistoryMessage],
@@ -530,6 +534,15 @@ async def chat(
         user_message,
     )
 
+    prepared_user_message = prepare_user_message(
+        user_message,
+        request_body.language,
+    )
+
+    print(
+        f"AI Chat request language={request_body.language}"
+    )
+
     messages = [
         {
             "role":
@@ -546,7 +559,7 @@ async def chat(
                 "user",
 
             "content":
-                user_message,
+                prepared_user_message,
         },
     ]
 
@@ -569,7 +582,7 @@ async def chat(
 
         "options": {
             "temperature":
-                0.30,
+                0.25,
 
             "num_predict":
                 OLLAMA_NUM_PREDICT,
