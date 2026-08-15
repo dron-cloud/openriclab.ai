@@ -374,6 +374,132 @@ button, input, textarea, select { font: inherit; }
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity .65s ease, transform .65s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
+/* ============================================================
+   AI CHAT — ENGLISH / KHMER LANGUAGE BUTTONS
+   Only affects the language selector.
+   ============================================================ */
+
+/* Allow the language switch to sit at the true center */
+#wireless-copilot .copilot-window-top {
+  position: relative;
+}
+
+
+/* Center selector between AI Chat and Research Prototype */
+#wireless-copilot .chat-language-selector {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  padding: 4px;
+
+  border: 1px solid #e0e0e0;
+  border-radius: 999px;
+
+  background: #f2f2f2;
+
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+
+/* Individual language button */
+#wireless-copilot .language-button {
+  appearance: none;
+
+  min-width: 90px;
+  height: 36px;
+
+  padding: 0 15px;
+
+  border: 0;
+  border-radius: 999px;
+
+  background: transparent;
+  color: #555555;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+
+/* Hover */
+#wireless-copilot .language-button:hover:not(.active) {
+  color: #cc0000;
+  background: rgba(204, 0, 0, 0.07);
+}
+
+
+/* Selected language — same red family as AI logo */
+#wireless-copilot .language-button.active {
+  color: #ffffff;
+  background: #cc0000;
+
+  box-shadow:
+    0 4px 12px rgba(204, 0, 0, 0.22);
+}
+
+
+/* Slight click feedback */
+#wireless-copilot .language-button:active {
+  transform: scale(0.97);
+}
+
+
+/* Keyboard accessibility */
+#wireless-copilot .language-button:focus-visible {
+  outline: 3px solid rgba(204, 0, 0, 0.22);
+  outline-offset: 2px;
+}
+
+
+/* Disabled while AI is responding */
+#wireless-copilot .language-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 680px) {
+
+  #wireless-copilot .chat-language-selector {
+    position: static;
+    transform: none;
+
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #wireless-copilot .language-button {
+    min-width: 78px;
+    height: 34px;
+
+    padding: 0 12px;
+
+    font-size: 11px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
