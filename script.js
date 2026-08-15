@@ -56,27 +56,38 @@
   }
 
   // ------------------------------------------------------------
-  // Header state
+  // Header scroll state
   // ------------------------------------------------------------
 
   const updateHeader = () => {
     if (!header) return;
-    header.classList.toggle("scrolled", window.scrollY > 18);
+
+    header.classList.toggle(
+      "scrolled",
+      window.scrollY > 18
+    );
   };
 
   updateHeader();
 
-  window.addEventListener("scroll", updateHeader, {
-    passive: true
-  });
+  window.addEventListener(
+    "scroll",
+    updateHeader,
+    { passive: true }
+  );
+
+  // ------------------------------------------------------------
+  // Reduced motion
+  // ------------------------------------------------------------
+
+  const prefersReducedMotion =
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
   // ------------------------------------------------------------
   // Reveal animations
   // ------------------------------------------------------------
-
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
 
   if (
     prefersReducedMotion ||
@@ -86,20 +97,21 @@
       item.classList.add("visible");
     });
   } else {
-    const revealObserver = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin: "0px 0px -45px 0px"
-      }
-    );
+    const revealObserver =
+      new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.12,
+          rootMargin: "0px 0px -45px 0px"
+        }
+      );
 
     revealItems.forEach(item => {
       revealObserver.observe(item);
@@ -107,44 +119,65 @@
   }
 
   // ------------------------------------------------------------
-  // Active navigation link
+  // Active navigation section
   // ------------------------------------------------------------
 
   const sections = navLinks
     .map(link => link.getAttribute("href"))
-    .filter(href => href && href.startsWith("#") && href.length > 1)
-    .map(href => document.getElementById(href.slice(1)))
+    .filter(
+      href =>
+        href &&
+        href.startsWith("#") &&
+        href.length > 1
+    )
+    .map(href =>
+      document.getElementById(
+        href.slice(1)
+      )
+    )
     .filter(Boolean);
 
   if (
     sections.length > 0 &&
     "IntersectionObserver" in window
   ) {
-    const sectionObserver = new IntersectionObserver(
-      entries => {
-        const visible = entries
-          .filter(entry => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              b.intersectionRatio - a.intersectionRatio
-          );
+    const sectionObserver =
+      new IntersectionObserver(
+        entries => {
+          const visible = entries
+            .filter(
+              entry =>
+                entry.isIntersecting
+            )
+            .sort(
+              (a, b) =>
+                b.intersectionRatio -
+                a.intersectionRatio
+            );
 
-        if (!visible.length) return;
+          if (!visible.length) return;
 
-        const activeId = visible[0].target.id;
+          const activeId =
+            visible[0].target.id;
 
-        navLinks.forEach(link => {
-          link.classList.toggle(
-            "active",
-            link.getAttribute("href") === `#${activeId}`
-          );
-        });
-      },
-      {
-        rootMargin: "-25% 0px -60% 0px",
-        threshold: [0.01, 0.2, 0.5]
-      }
-    );
+          navLinks.forEach(link => {
+            link.classList.toggle(
+              "active",
+              link.getAttribute("href") ===
+                `#${activeId}`
+            );
+          });
+        },
+        {
+          rootMargin:
+            "-25% 0px -60% 0px",
+          threshold: [
+            0.01,
+            0.2,
+            0.5
+          ]
+        }
+      );
 
     sections.forEach(section => {
       sectionObserver.observe(section);
@@ -155,41 +188,77 @@
   // Smooth scrolling
   // ------------------------------------------------------------
 
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener("click", event => {
-      const targetId = anchor.getAttribute("href");
+  document
+    .querySelectorAll('a[href^="#"]')
+    .forEach(anchor => {
+      anchor.addEventListener(
+        "click",
+        event => {
+          const targetId =
+            anchor.getAttribute("href");
 
-      if (!targetId || targetId === "#") return;
+          if (
+            !targetId ||
+            targetId === "#"
+          ) {
+            return;
+          }
 
-      const target = document.querySelector(targetId);
+          const target =
+            document.querySelector(
+              targetId
+            );
 
-      if (!target) return;
+          if (!target) return;
 
-      event.preventDefault();
+          event.preventDefault();
 
-      target.scrollIntoView({
-        behavior: prefersReducedMotion ? "auto" : "smooth",
-        block: "start"
-      });
+          target.scrollIntoView({
+            behavior:
+              prefersReducedMotion
+                ? "auto"
+                : "smooth",
+            block:
+              "start"
+          });
+        }
+      );
     });
-  });
 
   // ============================================================
   // GENERAL-PURPOSE AI CHAT
   // ============================================================
 
-  const chat = document.getElementById("copilot-chat");
-  const form = document.getElementById("copilot-preview-form");
-  const input = document.getElementById("copilot-preview-input");
-  const submit = document.getElementById("copilot-submit");
+  const chat =
+    document.getElementById(
+      "copilot-chat"
+    );
+
+  const form =
+    document.getElementById(
+      "copilot-preview-form"
+    );
+
+  const input =
+    document.getElementById(
+      "copilot-preview-input"
+    );
+
+  const submit =
+    document.getElementById(
+      "copilot-submit"
+    );
 
   const languageButtons = [
-    ...document.querySelectorAll(".language-button")
+    ...document.querySelectorAll(
+      ".language-button"
+    )
   ];
 
-  const apiMeta = document.querySelector(
-    'meta[name="wirelessai-api-url"]'
-  );
+  const apiMeta =
+    document.querySelector(
+      'meta[name="wirelessai-api-url"]'
+    );
 
   const API_URL = (
     window.WIRELESSAI_API_URL ||
@@ -199,116 +268,174 @@
 
   const MAX_HISTORY_MESSAGES = 8;
   const MAX_INPUT_CHARACTERS = 6000;
-  const REQUEST_TIMEOUT_MS = 310000;
+
+  // Backend timeout is 180 seconds.
+  // Browser timeout is slightly longer.
+  const REQUEST_TIMEOUT_MS = 190000;
 
   let conversation = [];
   let busy = false;
   let selectedLanguage = "en";
 
-  // ------------------------------------------------------------
-  // Language selector
-  // ------------------------------------------------------------
+  // ============================================================
+  // LANGUAGE SELECTOR
+  // ============================================================
 
-  const updateLanguageUI = language => {
-    selectedLanguage =
-      language === "km"
-        ? "km"
-        : "en";
+  const updateLanguageUI =
+    language => {
+      selectedLanguage =
+        language === "km"
+          ? "km"
+          : "en";
 
-    languageButtons.forEach(button => {
-      const isActive =
-        button.dataset.language === selectedLanguage;
+      languageButtons.forEach(
+        button => {
+          const isActive =
+            button.dataset.language ===
+            selectedLanguage;
 
-      button.classList.toggle(
-        "active",
-        isActive
+          button.classList.toggle(
+            "active",
+            isActive
+          );
+
+          button.setAttribute(
+            "aria-pressed",
+            String(isActive)
+          );
+        }
       );
 
-      button.setAttribute(
-        "aria-pressed",
-        String(isActive)
-      );
-    });
+      if (input) {
+        input.placeholder =
+          selectedLanguage === "km"
+            ? "សូមសួរសំណួររបស់អ្នក..."
+            : "Start Chatting...";
+      }
 
-    if (input) {
-      input.placeholder =
-        selectedLanguage === "km"
-          ? "សូមសួរសំណួររបស់អ្នក..."
-          : "Start Chatting...";
+      if (submit && !busy) {
+        submit.textContent =
+          selectedLanguage === "km"
+            ? "សួរ"
+            : "Ask";
+      }
+
+      input?.focus();
+    };
+
+  languageButtons.forEach(
+    button => {
+      button.addEventListener(
+        "click",
+        () => {
+          updateLanguageUI(
+            button.dataset.language
+          );
+        }
+      );
     }
+  );
 
-    input?.focus();
-  };
-
-  languageButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      updateLanguageUI(
-        button.dataset.language
-      );
-    });
-  });
-
-  // ------------------------------------------------------------
-  // Safe answer formatting
-  // ------------------------------------------------------------
+  // ============================================================
+  // SAFE ANSWER FORMATTING
+  // ============================================================
 
   const escapeHTML = value =>
     String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
 
-  const formatAnswer = value => {
-    const text = String(value || "");
-
-    if (
-      window.marked &&
-      typeof window.marked.parse === "function" &&
-      window.DOMPurify
-    ) {
-      try {
-        const rendered = window.marked.parse(text, {
-          gfm: true,
-          breaks: true
-        });
-
-        return window.DOMPurify.sanitize(rendered);
-      } catch (error) {
-        console.warn(
-          "Markdown rendering failed:",
-          error
-        );
-      }
-    }
-
-    return escapeHTML(text).replace(
-      /\n/g,
-      "<br>"
-    );
-  };
-
-  const secureLinks = container => {
-    if (!container) return;
-
-    container.querySelectorAll("a").forEach(link => {
-      const href =
-        link.getAttribute("href") || "";
+  const formatAnswer =
+    value => {
+      const text =
+        String(value || "");
 
       if (
-        href.startsWith("https://") ||
-        href.startsWith("http://")
+        window.marked &&
+        typeof window.marked.parse ===
+          "function" &&
+        window.DOMPurify
       ) {
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-      }
-    });
-  };
+        try {
+          const rendered =
+            window.marked.parse(
+              text,
+              {
+                gfm: true,
+                breaks: true
+              }
+            );
 
-  // ------------------------------------------------------------
-  // Chat messages
-  // ------------------------------------------------------------
+          return (
+            window.DOMPurify.sanitize(
+              rendered
+            )
+          );
+        } catch (error) {
+          console.warn(
+            "Markdown rendering failed:",
+            error
+          );
+        }
+      }
+
+      return escapeHTML(text)
+        .replace(
+          /\n/g,
+          "<br>"
+        );
+    };
+
+  const secureLinks =
+    container => {
+      if (!container) return;
+
+      container
+        .querySelectorAll("a")
+        .forEach(link => {
+          const href =
+            link.getAttribute(
+              "href"
+            ) || "";
+
+          if (
+            href.startsWith(
+              "https://"
+            ) ||
+            href.startsWith(
+              "http://"
+            )
+          ) {
+            link.target =
+              "_blank";
+
+            link.rel =
+              "noopener noreferrer";
+          }
+        });
+    };
+
+  // ============================================================
+  // CHAT MESSAGE RENDERING
+  // ============================================================
 
   const appendMessage = (
     role,
@@ -317,17 +444,25 @@
   ) => {
     if (!chat) return null;
 
-    const row = document.createElement("div");
+    const row =
+      document.createElement(
+        "div"
+      );
 
-    row.className = `chat-row ${
-      role === "user"
-        ? "user-row"
-        : "assistant-row"
-    }`;
+    row.className =
+      `chat-row ${
+        role === "user"
+          ? "user-row"
+          : "assistant-row"
+      }`;
 
-    if (role === "assistant") {
+    if (
+      role === "assistant"
+    ) {
       const avatar =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       avatar.className =
         "chat-avatar";
@@ -341,13 +476,16 @@
     }
 
     const bubble =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
-    bubble.className = `chat-bubble ${
-      role === "user"
-        ? "user-bubble"
-        : "assistant-bubble"
-    }`;
+    bubble.className =
+      `chat-bubble ${
+        role === "user"
+          ? "user-bubble"
+          : "assistant-bubble"
+      }`;
 
     if (loading) {
       bubble.classList.add(
@@ -386,44 +524,48 @@
     return row;
   };
 
-  // ------------------------------------------------------------
-  // Busy state
-  // ------------------------------------------------------------
+  // ============================================================
+  // BUSY STATE
+  // ============================================================
 
-  const setBusy = state => {
-    busy = state;
+  const setBusy =
+    state => {
+      busy = state;
 
-    if (submit) {
-      submit.disabled =
-        state;
+      if (submit) {
+        submit.disabled =
+          state;
 
-      submit.textContent =
-        state
-          ? (
-              selectedLanguage === "km"
-                ? "កំពុងគិត..."
-                : "Thinking…"
-            )
-          : (
-              selectedLanguage === "km"
-                ? "សួរ"
-                : "Ask"
-            );
-    }
+        submit.textContent =
+          state
+            ? (
+                selectedLanguage === "km"
+                  ? "កំពុងគិត..."
+                  : "Thinking…"
+              )
+            : (
+                selectedLanguage === "km"
+                  ? "សួរ"
+                  : "Ask"
+              );
+      }
 
-    if (input) {
-      input.disabled =
-        state;
-    }
+      if (input) {
+        input.disabled =
+          state;
+      }
 
-    languageButtons.forEach(button => {
-      button.disabled = state;
-    });
-  };
+      languageButtons.forEach(
+        button => {
+          button.disabled =
+            state;
+        }
+      );
+    };
 
-  // ------------------------------------------------------------
-  // Input configuration
-  // ------------------------------------------------------------
+  // ============================================================
+  // INPUT CONFIGURATION
+  // ============================================================
 
   if (input) {
     input.maxLength =
@@ -432,9 +574,9 @@
 
   updateLanguageUI("en");
 
-  // ------------------------------------------------------------
-  // Submit question
-  // ------------------------------------------------------------
+  // ============================================================
+  // FORM SUBMISSION
+  // ============================================================
 
   if (
     form &&
@@ -453,6 +595,19 @@
 
         if (!question) {
           input.focus();
+          return;
+        }
+
+        if (
+          question.length >
+          MAX_INPUT_CHARACTERS
+        ) {
+          appendMessage(
+            "assistant",
+            selectedLanguage === "km"
+              ? "សំណួររបស់អ្នកវែងពេក។ សូមបន្ថយប្រវែងសំណួរ។"
+              : "Your question is too long. Please shorten it."
+          );
           return;
         }
 
@@ -488,6 +643,7 @@
         });
 
         input.value = "";
+
         setBusy(true);
 
         const loadingRow =
@@ -504,7 +660,8 @@
 
         const timeoutId =
           window.setTimeout(
-            () => controller.abort(),
+            () =>
+              controller.abort(),
             REQUEST_TIMEOUT_MS
           );
 
@@ -552,24 +709,21 @@
               `HTTP ${response.status}`;
 
             if (
-              response.status ===
-              429
+              response.status === 429
             ) {
               message =
                 selectedLanguage === "km"
                   ? "មានសំណើច្រើនពេក។ សូមរង់ចាំបន្តិច ហើយសាកល្បងម្តងទៀត។"
                   : "Too many requests. Please wait a few minutes and try again.";
             } else if (
-              response.status ===
-              413
+              response.status === 413
             ) {
               message =
                 selectedLanguage === "km"
                   ? "សាររបស់អ្នកវែងពេក។"
                   : "Your message is too long.";
             } else if (
-              response.status ===
-              504
+              response.status === 504
             ) {
               message =
                 selectedLanguage === "km"
@@ -637,7 +791,7 @@
           if (
             error &&
             error.name ===
-            "AbortError"
+              "AbortError"
           ) {
             message =
               selectedLanguage === "km"
@@ -656,7 +810,7 @@
             message
           );
 
-          // Remove unanswered user message from local history.
+          // Remove the unanswered user turn.
           if (
             conversation.length &&
             conversation[
@@ -681,7 +835,7 @@
   }
 
   // ============================================================
-  // OPTIONAL BACKEND HEALTH CHECK
+  // BACKEND HEALTH CHECK
   // ============================================================
 
   const checkBackendHealth =

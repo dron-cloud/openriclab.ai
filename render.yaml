@@ -22,7 +22,7 @@ services:
         value: https://ollama.com/api
 
       - key: REQUEST_TIMEOUT_SECONDS
-        value: "300"
+        value: "180"
 
       - key: OLLAMA_NUM_PREDICT
         value: "-1"
