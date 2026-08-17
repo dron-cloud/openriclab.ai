@@ -1309,3 +1309,181 @@ body {
   }
 }
 
+/* ============================================================
+   AI CHAT — FILE UPLOAD
+   Scoped only to the WirelessAI Chat component.
+   ============================================================ */
+
+#wireless-copilot .copilot-file-button {
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #cfcfcf;
+  border-radius: 11px;
+  color: #333333;
+  background: #ffffff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color .18s ease,
+    color .18s ease,
+    background-color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease;
+}
+
+#wireless-copilot .copilot-file-button:hover {
+  transform: translateY(-1px);
+  border-color: #cc0000;
+  color: #cc0000;
+  background: #fff7f7;
+}
+
+#wireless-copilot .copilot-file-button:focus-visible {
+  outline: none;
+  border-color: #cc0000;
+  box-shadow: 0 0 0 3px rgba(204, 0, 0, .12);
+}
+
+#wireless-copilot .copilot-file-button:disabled {
+  opacity: .55;
+  cursor: wait;
+  transform: none;
+}
+
+#wireless-copilot .copilot-file-preview {
+  width: calc(100% - 44px);
+  margin: 14px 22px 0;
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid #dddddd;
+  border-radius: 11px;
+  background: #fafafa;
+}
+
+#wireless-copilot .copilot-file-preview[hidden] {
+  display: none !important;
+}
+
+#wireless-copilot .copilot-file-preview-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+#wireless-copilot .copilot-file-icon {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #990000;
+  background: #fff0f0;
+  font-size: 17px;
+}
+
+#wireless-copilot .copilot-file-meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.25;
+}
+
+#wireless-copilot .copilot-file-meta strong {
+  max-width: min(70vw, 760px);
+  overflow: hidden;
+  color: #222222;
+  font-size: 12px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#wireless-copilot .copilot-file-meta small {
+  color: #777777;
+  font-size: 10px;
+}
+
+#wireless-copilot .copilot-file-remove {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  color: #666666;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color .18s ease,
+    background-color .18s ease;
+}
+
+#wireless-copilot .copilot-file-remove:hover {
+  color: #ffffff;
+  background: #cc0000;
+}
+
+#wireless-copilot .copilot-file-remove:focus-visible {
+  outline: 3px solid rgba(204, 0, 0, .18);
+  outline-offset: 2px;
+}
+
+#wireless-copilot .copilot-file-remove:disabled {
+  opacity: .45;
+  cursor: wait;
+}
+
+#wireless-copilot .copilot-upload-note {
+  margin: 0;
+  padding: 0 22px 9px;
+  color: #777777;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* Keep the hidden file input hidden even though the general
+   .copilot-input-row input rule styles text inputs. */
+#wireless-copilot #copilot-file-input[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 680px) {
+  #wireless-copilot .copilot-file-preview {
+    width: calc(100% - 30px);
+    margin: 12px 15px 0;
+    padding: 10px;
+  }
+
+  #wireless-copilot .copilot-file-meta strong {
+    max-width: 58vw;
+    font-size: 11px;
+  }
+
+  #wireless-copilot .copilot-file-button {
+    flex-basis: 48px;
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  #wireless-copilot .copilot-upload-note {
+    padding: 0 15px 8px;
+    font-size: 9px;
+  }
+}
+

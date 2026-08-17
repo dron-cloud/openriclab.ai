@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#CC0000" />
   <!-- After deploying backend/app.py, set this to e.g. https://your-service.onrender.com/api/chat -->
   <meta name="wirelessai-api-url" content="https://openriclab-ai-python.onrender.com/api/chat" />
+  <meta name="wirelessai-file-api-url" content="https://openriclab-ai-python.onrender.com/api/chat/file" />
   <title>Dr. Dara Ron | AI-Native FutureG Networks</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -304,11 +305,62 @@
         </div>
 
 
+        <!-- File status / preview -->
+        <div
+          id="copilot-file-preview"
+          class="copilot-file-preview"
+          aria-live="polite"
+          hidden
+        >
+          <div class="copilot-file-preview-main">
+            <span
+              class="copilot-file-icon"
+              aria-hidden="true"
+            >
+              📄
+            </span>
+
+            <div class="copilot-file-meta">
+              <strong id="copilot-file-name"></strong>
+              <small id="copilot-file-size"></small>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            id="copilot-file-remove"
+            class="copilot-file-remove"
+            aria-label="Remove uploaded file"
+            title="Remove file"
+          >
+            ×
+          </button>
+        </div>
+
         <!-- Chat input -->
         <form
           class="copilot-input-row"
           id="copilot-preview-form"
+          enctype="multipart/form-data"
         >
+
+          <input
+            id="copilot-file-input"
+            type="file"
+            accept=".pdf,.docx,.xlsx,.xlsm,.xltx,.xltm,.pptx,.ppsx,.potx,.csv,.tsv,.txt,.md,.markdown,.rst,.log,.json,.jsonl,.ndjson,.xml,.yaml,.yml,.toml,.ini,.cfg,.conf,.html,.htm,.css,.scss,.sass,.less,.js,.mjs,.cjs,.jsx,.ts,.tsx,.py,.ipynb,.java,.c,.h,.cpp,.hpp,.cc,.cxx,.cs,.go,.rs,.rb,.php,.swift,.kt,.kts,.scala,.sh,.bash,.zsh,.fish,.ps1,.sql,.r,.m,.tex,.bib,.gradle,.properties,.env,.gitignore"
+            hidden
+          />
+
+          <button
+            type="button"
+            id="copilot-file-button"
+            class="copilot-file-button"
+            aria-label="Upload a document"
+            title="Upload a document"
+          >
+            <span aria-hidden="true">📎</span>
+            <span class="sr-only">Upload a document</span>
+          </button>
 
           <label
             class="sr-only"
@@ -322,7 +374,6 @@
             type="text"
             placeholder="Start Chatting..."
             autocomplete="off"
-            maxlength="6000"
           />
 
           <button

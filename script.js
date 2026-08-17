@@ -266,6 +266,52 @@
     ""
   ).trim();
 
+  const fileApiMeta =
+    document.querySelector(
+      'meta[name="wirelessai-file-api-url"]'
+    );
+
+  const FILE_API_URL = (
+    window.WIRELESSAI_FILE_API_URL ||
+    fileApiMeta?.content ||
+    ""
+  ).trim();
+
+  const fileInput =
+    document.getElementById(
+      "copilot-file-input"
+    );
+
+  const fileButton =
+    document.getElementById(
+      "copilot-file-button"
+    );
+
+  const filePreview =
+    document.getElementById(
+      "copilot-file-preview"
+    );
+
+  const fileRemove =
+    document.getElementById(
+      "copilot-file-remove"
+    );
+
+  const fileName =
+    document.getElementById(
+      "copilot-file-name"
+    );
+
+  const fileSize =
+    document.getElementById(
+      "copilot-file-size"
+    );
+
+  const MAX_FILE_BYTES =
+    10 * 1024 * 1024;
+
+  let selectedFile = null;
+
   const MAX_HISTORY_MESSAGES = 8;
   const MAX_INPUT_CHARACTERS = 6000;
 
@@ -561,7 +607,157 @@
             state;
         }
       );
+
+      if (fileButton) {
+        fileButton.disabled =
+          state;
+      }
+
+      if (fileRemove) {
+        fileRemove.disabled =
+          state;
+      }
+
+      if (fileInput) {
+        fileInput.disabled =
+          state;
+      }
     };
+
+  // ============================================================
+  // FILE UPLOAD UI
+  // ============================================================
+
+  const formatFileSize =
+    bytes => {
+      if (
+        !Number.isFinite(bytes) ||
+        bytes < 0
+      ) {
+        return "";
+      }
+
+      if (
+        bytes < 1024
+      ) {
+        return `${bytes} B`;
+      }
+
+      if (
+        bytes <
+        1024 * 1024
+      ) {
+        return `${(
+          bytes / 1024
+        ).toFixed(1)} KB`;
+      }
+
+      return `${(
+        bytes /
+        (1024 * 1024)
+      ).toFixed(2)} MB`;
+    };
+
+  const clearSelectedFile =
+    () => {
+      selectedFile = null;
+
+      if (fileInput) {
+        fileInput.value = "";
+      }
+
+      if (fileName) {
+        fileName.textContent = "";
+      }
+
+      if (fileSize) {
+        fileSize.textContent = "";
+      }
+
+      if (filePreview) {
+        filePreview.hidden = true;
+      }
+    };
+
+  const showSelectedFile =
+    file => {
+      if (!file) {
+        clearSelectedFile();
+        return;
+      }
+
+      selectedFile = file;
+
+      if (fileName) {
+        fileName.textContent =
+          file.name;
+      }
+
+      if (fileSize) {
+        fileSize.textContent =
+          formatFileSize(
+            file.size
+          );
+      }
+
+      if (filePreview) {
+        filePreview.hidden = false;
+      }
+    };
+
+  fileButton?.addEventListener(
+    "click",
+    () => {
+      if (busy) return;
+
+      fileInput?.click();
+    }
+  );
+
+  fileInput?.addEventListener(
+    "change",
+    () => {
+      const file =
+        fileInput.files?.[0];
+
+      if (!file) {
+        clearSelectedFile();
+        return;
+      }
+
+      if (
+        file.size >
+        MAX_FILE_BYTES
+      ) {
+        clearSelectedFile();
+
+        appendMessage(
+          "assistant",
+          selectedLanguage === "km"
+            ? "ឯកសារធំពេក។ ទំហំអតិបរមាគឺ 10 MB។"
+            : "The file is too large. Maximum size is 10 MB."
+        );
+
+        return;
+      }
+
+      showSelectedFile(
+        file
+      );
+
+      input?.focus();
+    }
+  );
+
+  fileRemove?.addEventListener(
+    "click",
+    () => {
+      if (busy) return;
+
+      clearSelectedFile();
+      input?.focus();
+    }
+  );
 
   // ============================================================
   // INPUT CONFIGURATION
@@ -611,7 +807,15 @@
           return;
         }
 
-        if (!API_URL) {
+        const fileForRequest =
+          selectedFile;
+
+        const requestUrl =
+          fileForRequest
+            ? FILE_API_URL
+            : API_URL;
+
+        if (!requestUrl) {
           appendMessage(
             "user",
             question
@@ -905,36 +1109,80 @@
           };
 
         try {
-          const response =
-            await fetch(
-              API_URL,
-              {
-                method: "POST",
+          let response;
 
-                headers: {
-                  "Content-Type":
-                    "application/json",
+          if (fileForRequest) {
+            const formData =
+              new FormData();
 
-                  "Accept":
-                    "application/x-ndjson, application/json"
-                },
-
-                body:
-                  JSON.stringify({
-                    message:
-                      question,
-
-                    history:
-                      historyForRequest,
-
-                    language:
-                      requestLanguage
-                  }),
-
-                signal:
-                  controller.signal
-              }
+            formData.append(
+              "message",
+              question
             );
+
+            formData.append(
+              "language",
+              requestLanguage
+            );
+
+            formData.append(
+              "file",
+              fileForRequest,
+              fileForRequest.name
+            );
+
+            response =
+              await fetch(
+                requestUrl,
+                {
+                  method:
+                    "POST",
+
+                  headers: {
+                    "Accept":
+                      "application/x-ndjson, application/json"
+                  },
+
+                  body:
+                    formData,
+
+                  signal:
+                    controller.signal
+                }
+              );
+          } else {
+            response =
+              await fetch(
+                requestUrl,
+                {
+                  method:
+                    "POST",
+
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+
+                    "Accept":
+                      "application/x-ndjson, application/json"
+                  },
+
+                  body:
+                    JSON.stringify({
+                      message:
+                        question,
+
+                      history:
+                        historyForRequest,
+
+                      language:
+                        requestLanguage
+                    }),
+
+                  signal:
+                    controller.signal
+                }
+              );
+          }
 
           resetIdleTimeout();
 
@@ -965,6 +1213,26 @@
                 requestLanguage === "km"
                   ? "សាររបស់អ្នកវែងពេក។"
                   : "Your message is too long.";
+            } else if (
+              response.status === 415
+            ) {
+              message =
+                payload.detail ||
+                (
+                  requestLanguage === "km"
+                    ? "ប្រភេទឯកសារនេះមិនត្រូវបានគាំទ្រទេ។"
+                    : "This file type is not supported."
+                );
+            } else if (
+              response.status === 422
+            ) {
+              message =
+                payload.detail ||
+                (
+                  requestLanguage === "km"
+                    ? "មិនអាចអានខ្លឹមសារពីឯកសារនេះបានទេ។"
+                    : "The uploaded file could not be read."
+                );
             } else if (
               response.status === 504
             ) {
@@ -1040,6 +1308,10 @@
             role: "assistant",
             content: answer
           });
+
+          if (fileForRequest) {
+            clearSelectedFile();
+          }
 
           if (
             conversation.length >
