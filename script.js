@@ -883,6 +883,7 @@
         let assistantRow = null;
         let assistantBubble = null;
         let answer = "";
+        let streamCompleted = false;
 
         const ensureAssistantBubble = () => {
           if (assistantBubble) {
@@ -995,6 +996,13 @@
 
               answer += chunk;
               renderStreamingAnswer();
+              return;
+            }
+
+            if (
+              eventPayload.type === "done"
+            ) {
+              streamCompleted = true;
               return;
             }
 
@@ -1191,12 +1199,12 @@
               await response
                 .json()
                 .catch(
-                  () => ({})
+                  () => null
                 );
 
             let message =
-              payload.detail ||
-              payload.error ||
+              payload?.detail ||
+              payload?.error ||
               `HTTP ${response.status}`;
 
             if (
@@ -1217,7 +1225,7 @@
               response.status === 415
             ) {
               message =
-                payload.detail ||
+                payload?.detail ||
                 (
                   requestLanguage === "km"
                     ? "ប្រភេទឯកសារនេះមិនត្រូវបានគាំទ្រទេ។"
@@ -1227,7 +1235,7 @@
               response.status === 422
             ) {
               message =
-                payload.detail ||
+                payload?.detail ||
                 (
                   requestLanguage === "km"
                     ? "មិនអាចអានខ្លឹមសារពីឯកសារនេះបានទេ។"
@@ -1273,7 +1281,11 @@
           // --------------------------------------------------
           else {
             const payload =
-              await response.json();
+              await response
+                .json()
+                .catch(
+                  () => null
+                );
 
             const fallbackAnswer =
               String(
