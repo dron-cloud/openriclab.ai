@@ -310,7 +310,7 @@ app = FastAPI(
         "General-purpose bilingual English/Khmer AI chat "
         "interface backed by Ollama Cloud."
     ),
-    version="7.1.0",
+    version="7.2.0",
 )
 
 
@@ -1594,6 +1594,11 @@ async def health() -> dict:
         "stream_format":
             "ndjson",
 
+        "routes": [
+            "/api/chat",
+            "/api/chat/file",
+        ],
+
         "khmer_pipeline":
             "km->en->AI->km",
     }
@@ -1604,8 +1609,205 @@ async def chat(
     request_body: ChatRequest,
     request: Request,
 ):
-    # normal text-only streaming chat
-    ...
+    enforce_rate_limit(request)
+
+    if not OLLAMA_API_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="The AI service is not configured correctly.",
+        )
+
+    user_message = request_body.message.strip()
+
+    if not user_message:
+        raise HTTPException(
+            status_code=422,
+            detail="Message cannot be empty.",
+        )
+
+    if len(user_message) > MAX_USER_CHARACTERS:
+        raise HTTPException(
+            status_code=413,
+            detail=(
+                "Your message is too long. "
+                f"Please keep it below {MAX_USER_CHARACTERS} characters."
+            ),
+        )
+
+    print(
+        "AI Chat request:",
+        {
+            "language": request_body.language,
+            "message_length": len(user_message),
+        },
+    )
+
+    async def browser_stream():
+        try:
+            yield ndjson_event(
+                "start",
+                language=request_body.language,
+            )
+
+            if request_body.language == "km":
+                yield ndjson_event(
+                    "status",
+                    stage="translating_question",
+                )
+
+                english_question = await translate_khmer_to_english(
+                    user_message
+                )
+
+                yield ndjson_event(
+                    "status",
+                    stage="reasoning",
+                )
+
+                english_messages = [
+                    {
+                        "role": "system",
+                        "content": build_system_prompt(),
+                    },
+                    {
+                        "role": "user",
+                        "content": english_question,
+                    },
+                ]
+
+                english_answer = await call_ollama(
+                    english_messages,
+                    thinking=get_thinking_setting(),
+                )
+
+                yield ndjson_event(
+                    "status",
+                    stage="translating_answer",
+                )
+
+                translation_messages = [
+                    {
+                        "role": "system",
+                        "content": ENGLISH_TO_KHMER_PROMPT,
+                    },
+                    {
+                        "role": "user",
+                        "content": english_answer,
+                    },
+                ]
+
+                content_seen = False
+
+                async for event_type, content in stream_ollama_events(
+                    translation_messages,
+                    thinking="low",
+                ):
+                    if event_type == "thinking":
+                        yield ndjson_event(
+                            "status",
+                            stage="translating_answer",
+                        )
+                        continue
+
+                    if event_type == "content" and content:
+                        content_seen = True
+                        yield ndjson_event(
+                            "chunk",
+                            content=content,
+                        )
+
+                if not content_seen:
+                    raise RuntimeError(
+                        "The AI model returned an empty Khmer response."
+                    )
+
+                yield ndjson_event(
+                    "done",
+                    language="km",
+                    model=OLLAMA_MODEL,
+                    pipeline="km->en->AI->km",
+                )
+                return
+
+            history = clean_history(
+                request_body.history,
+                user_message,
+            )
+
+            messages = [
+                {
+                    "role": "system",
+                    "content": build_system_prompt(),
+                },
+                *history,
+                {
+                    "role": "user",
+                    "content": user_message,
+                },
+            ]
+
+            content_seen = False
+
+            yield ndjson_event(
+                "status",
+                stage="reasoning",
+            )
+
+            async for event_type, content in stream_ollama_events(
+                messages,
+                thinking=get_thinking_setting(),
+            ):
+                if event_type == "thinking":
+                    yield ndjson_event(
+                        "status",
+                        stage="reasoning",
+                    )
+                    continue
+
+                if event_type == "content" and content:
+                    content_seen = True
+                    yield ndjson_event(
+                        "chunk",
+                        content=content,
+                    )
+
+            if not content_seen:
+                raise RuntimeError(
+                    "The AI model returned an empty response."
+                )
+
+            yield ndjson_event(
+                "done",
+                language="en",
+                model=OLLAMA_MODEL,
+                pipeline="direct-stream",
+            )
+
+        except Exception as exc:
+            print(
+                "AI Chat streaming error:",
+                repr(exc),
+            )
+
+            public_message = (
+                str(exc).strip()
+                or "The AI service encountered an error. Please try again."
+            )
+
+            yield ndjson_event(
+                "error",
+                message=public_message,
+            )
+
+    return StreamingResponse(
+        browser_stream(),
+        media_type="application/x-ndjson; charset=utf-8",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "X-Accel-Buffering": "no",
+            "Content-Type": "application/x-ndjson; charset=utf-8",
+        },
+    )
 
 
 @app.post("/api/chat/file")
