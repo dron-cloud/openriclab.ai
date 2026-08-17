@@ -1277,8 +1277,8 @@
 
             const fallbackAnswer =
               String(
-                payload.answer ||
-                payload.message ||
+                payload?.answer ||
+                payload?.message ||
                 ""
               ).trim();
 
