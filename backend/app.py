@@ -1599,6 +1599,15 @@ async def health() -> dict:
     }
 
 
+@app.post("/api/chat")
+async def chat(
+    request_body: ChatRequest,
+    request: Request,
+):
+    # normal text-only streaming chat
+    ...
+
+
 @app.post("/api/chat/file")
 async def chat_with_file(
     request: Request,
@@ -1606,6 +1615,9 @@ async def chat_with_file(
     language: str = Form("en"),
     file: UploadFile = File(...),
 ):
+    # document-upload streaming chat
+    ...
+
     # --------------------------------------------------------
     # Validate request before streaming begins
     # --------------------------------------------------------
