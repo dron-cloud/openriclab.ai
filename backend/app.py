@@ -1,16 +1,23 @@
 from __future__ import annotations
 
+import csv
+import io
 import json
 import os
 import time
 from collections import defaultdict, deque
+from pathlib import Path
 from typing import Literal
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request
+from docx import Document
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from openpyxl import load_workbook
+from pptx import Presentation
 from pydantic import BaseModel, Field
+from pypdf import PdfReader
 
 
 # ============================================================
@@ -95,6 +102,46 @@ RATE_LIMIT_WINDOW_SECONDS = int(
     os.getenv(
         "RATE_LIMIT_WINDOW_SECONDS",
         "600",
+    )
+)
+
+
+# ============================================================
+# File-upload limits
+# ============================================================
+
+MAX_FILE_BYTES = int(
+    os.getenv(
+        "MAX_FILE_BYTES",
+        str(10 * 1024 * 1024),
+    )
+)
+
+MAX_DOCUMENT_CHARACTERS = int(
+    os.getenv(
+        "MAX_DOCUMENT_CHARACTERS",
+        "60000",
+    )
+)
+
+MAX_PDF_PAGES = int(
+    os.getenv(
+        "MAX_PDF_PAGES",
+        "80",
+    )
+)
+
+MAX_SPREADSHEET_ROWS = int(
+    os.getenv(
+        "MAX_SPREADSHEET_ROWS",
+        "3000",
+    )
+)
+
+MAX_PRESENTATION_SLIDES = int(
+    os.getenv(
+        "MAX_PRESENTATION_SLIDES",
+        "100",
     )
 )
 
@@ -856,6 +903,633 @@ async def translate_english_to_khmer(
     )
 
 
+
+# ============================================================
+# File extraction helpers
+# ============================================================
+
+TEXT_EXTENSIONS = {
+    ".txt", ".md", ".markdown", ".rst", ".log",
+    ".csv", ".tsv", ".json", ".jsonl", ".ndjson",
+    ".xml", ".yaml", ".yml", ".toml", ".ini", ".cfg", ".conf",
+    ".html", ".htm", ".css", ".scss", ".sass", ".less",
+    ".js", ".mjs", ".cjs", ".jsx", ".ts", ".tsx",
+    ".py", ".ipynb", ".java", ".c", ".h", ".cpp", ".hpp",
+    ".cc", ".cxx", ".cs", ".go", ".rs", ".rb", ".php",
+    ".swift", ".kt", ".kts", ".scala", ".sh", ".bash",
+    ".zsh", ".fish", ".ps1", ".sql", ".r", ".m",
+    ".tex", ".bib", ".gradle", ".properties", ".env",
+    ".gitignore", ".dockerfile",
+}
+
+BLOCKED_EXTENSIONS = {
+    ".exe", ".dll", ".so", ".dylib", ".bin", ".app",
+    ".msi", ".dmg", ".pkg", ".apk", ".ipa",
+    ".jar", ".war",
+    ".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".xz",
+    ".iso",
+}
+
+IMAGE_EXTENSIONS = {
+    ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff",
+    ".webp", ".heic", ".heif", ".svg",
+}
+
+LEGACY_OFFICE_EXTENSIONS = {
+    ".doc", ".xls", ".ppt",
+}
+
+
+def truncate_document_text(
+    text: str,
+) -> str:
+    text = (
+        text
+        .replace("\x00", "")
+        .strip()
+    )
+
+    if (
+        len(text)
+        <= MAX_DOCUMENT_CHARACTERS
+    ):
+        return text
+
+    return (
+        text[
+            :MAX_DOCUMENT_CHARACTERS
+        ]
+        + "\n\n[Document truncated because it exceeded the "
+        "configured text limit.]"
+    )
+
+
+def decode_text_bytes(
+    data: bytes,
+) -> str:
+    """
+    Decode common text encodings without adding a heavy charset detector.
+    """
+    for encoding in (
+        "utf-8-sig",
+        "utf-8",
+        "utf-16",
+        "utf-16-le",
+        "utf-16-be",
+        "latin-1",
+    ):
+        try:
+            return data.decode(
+                encoding
+            )
+        except UnicodeDecodeError:
+            continue
+
+    return data.decode(
+        "utf-8",
+        errors="replace",
+    )
+
+
+def extract_pdf_text(
+    data: bytes,
+) -> str:
+    try:
+        reader = PdfReader(
+            io.BytesIO(data)
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=415,
+            detail=(
+                "The PDF could not be opened or is invalid."
+            ),
+        ) from exc
+
+    if reader.is_encrypted:
+        try:
+            unlocked = reader.decrypt("")
+        except Exception:
+            unlocked = 0
+
+        if not unlocked:
+            raise HTTPException(
+                status_code=415,
+                detail=(
+                    "Password-protected PDFs are not supported."
+                ),
+            )
+
+    parts: list[str] = []
+
+    for page_number, page in enumerate(
+        reader.pages[:MAX_PDF_PAGES],
+        start=1,
+    ):
+        try:
+            page_text = (
+                page.extract_text()
+                or ""
+            ).strip()
+        except Exception as exc:
+            print(
+                f"PDF page {page_number} extraction error:",
+                repr(exc),
+            )
+            page_text = ""
+
+        if page_text:
+            parts.append(
+                f"\n--- PDF PAGE {page_number} ---\n"
+                f"{page_text}"
+            )
+
+        if (
+            sum(
+                len(part)
+                for part in parts
+            )
+            >= MAX_DOCUMENT_CHARACTERS
+        ):
+            break
+
+    text = "\n".join(
+        parts
+    ).strip()
+
+    if not text:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "No extractable text was found in this PDF. "
+                "It may be a scanned/image-only PDF. OCR is not "
+                "enabled on this public endpoint."
+            ),
+        )
+
+    return truncate_document_text(
+        text
+    )
+
+
+def extract_docx_text(
+    data: bytes,
+) -> str:
+    try:
+        document = Document(
+            io.BytesIO(data)
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=415,
+            detail=(
+                "The DOCX file could not be opened."
+            ),
+        ) from exc
+
+    parts: list[str] = []
+
+    for paragraph in document.paragraphs:
+        text = (
+            paragraph.text
+            or ""
+        ).strip()
+
+        if text:
+            parts.append(text)
+
+    for table_index, table in enumerate(
+        document.tables,
+        start=1,
+    ):
+        parts.append(
+            f"\n--- TABLE {table_index} ---"
+        )
+
+        for row in table.rows:
+            values = [
+                (
+                    cell.text
+                    or ""
+                ).strip()
+                for cell in row.cells
+            ]
+
+            if any(values):
+                parts.append(
+                    " | ".join(values)
+                )
+
+    text = "\n".join(
+        parts
+    ).strip()
+
+    if not text:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "No extractable text was found in the DOCX file."
+            ),
+        )
+
+    return truncate_document_text(
+        text
+    )
+
+
+def extract_xlsx_text(
+    data: bytes,
+) -> str:
+    try:
+        workbook = load_workbook(
+            filename=io.BytesIO(data),
+            read_only=True,
+            data_only=True,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=415,
+            detail=(
+                "The Excel workbook could not be opened."
+            ),
+        ) from exc
+
+    parts: list[str] = []
+    row_count = 0
+
+    try:
+        for worksheet in workbook.worksheets:
+            parts.append(
+                f"\n--- SHEET: {worksheet.title} ---"
+            )
+
+            for row in worksheet.iter_rows(
+                values_only=True
+            ):
+                values = [
+                    ""
+                    if value is None
+                    else str(value)
+                    for value in row
+                ]
+
+                if any(
+                    value.strip()
+                    for value in values
+                ):
+                    parts.append(
+                        "\t".join(values)
+                    )
+
+                    row_count += 1
+
+                if (
+                    row_count
+                    >= MAX_SPREADSHEET_ROWS
+                ):
+                    parts.append(
+                        "\n[Spreadsheet row limit reached.]"
+                    )
+                    break
+
+            if (
+                row_count
+                >= MAX_SPREADSHEET_ROWS
+            ):
+                break
+    finally:
+        workbook.close()
+
+    text = "\n".join(
+        parts
+    ).strip()
+
+    if not text:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "No readable cell content was found in the workbook."
+            ),
+        )
+
+    return truncate_document_text(
+        text
+    )
+
+
+def extract_pptx_text(
+    data: bytes,
+) -> str:
+    try:
+        presentation = Presentation(
+            io.BytesIO(data)
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=415,
+            detail=(
+                "The PowerPoint file could not be opened."
+            ),
+        ) from exc
+
+    parts: list[str] = []
+
+    slides = presentation.slides[
+        :MAX_PRESENTATION_SLIDES
+    ]
+
+    for slide_number, slide in enumerate(
+        slides,
+        start=1,
+    ):
+        slide_parts: list[str] = []
+
+        for shape in slide.shapes:
+            if hasattr(
+                shape,
+                "text"
+            ):
+                text = (
+                    shape.text
+                    or ""
+                ).strip()
+
+                if text:
+                    slide_parts.append(
+                        text
+                    )
+
+            if getattr(
+                shape,
+                "has_table",
+                False,
+            ):
+                table = shape.table
+
+                for row in table.rows:
+                    values = [
+                        (
+                            cell.text
+                            or ""
+                        ).strip()
+                        for cell in row.cells
+                    ]
+
+                    if any(values):
+                        slide_parts.append(
+                            " | ".join(values)
+                        )
+
+        if slide_parts:
+            parts.append(
+                f"\n--- SLIDE {slide_number} ---\n"
+                + "\n".join(
+                    slide_parts
+                )
+            )
+
+    text = "\n".join(
+        parts
+    ).strip()
+
+    if not text:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "No extractable text was found in the presentation."
+            ),
+        )
+
+    return truncate_document_text(
+        text
+    )
+
+
+def extract_csv_or_tsv_text(
+    data: bytes,
+    extension: str,
+) -> str:
+    text = decode_text_bytes(
+        data
+    )
+
+    delimiter = (
+        "\t"
+        if extension == ".tsv"
+        else ","
+    )
+
+    reader = csv.reader(
+        io.StringIO(text),
+        delimiter=delimiter,
+    )
+
+    rows: list[str] = []
+
+    for index, row in enumerate(
+        reader,
+        start=1,
+    ):
+        if (
+            index
+            > MAX_SPREADSHEET_ROWS
+        ):
+            rows.append(
+                "[CSV/TSV row limit reached.]"
+            )
+            break
+
+        rows.append(
+            " | ".join(
+                str(value)
+                for value in row
+            )
+        )
+
+    return truncate_document_text(
+        "\n".join(rows)
+    )
+
+
+def extract_uploaded_file_text(
+    filename: str,
+    content_type: str,
+    data: bytes,
+) -> str:
+    """
+    Extract text from the broad set of document formats supported
+    by this public chat endpoint.
+
+    This intentionally does not execute, unpack, or render uploaded
+    user files.
+    """
+
+    extension = (
+        Path(filename)
+        .suffix
+        .lower()
+    )
+
+    lower_name = filename.lower()
+
+    if extension in BLOCKED_EXTENSIONS:
+        raise HTTPException(
+            status_code=415,
+            detail=(
+                "Executable and archive files are not supported."
+            ),
+        )
+
+    if extension in IMAGE_EXTENSIONS:
+        raise HTTPException(
+            status_code=415,
+            detail=(
+                "Image uploads require OCR/vision processing, which "
+                "is not enabled on this endpoint yet."
+            ),
+        )
+
+    if extension in LEGACY_OFFICE_EXTENSIONS:
+        raise HTTPException(
+            status_code=415,
+            detail=(
+                "Legacy .doc, .xls, and .ppt files are not supported. "
+                "Please save them as DOCX, XLSX, or PPTX."
+            ),
+        )
+
+    if extension == ".pdf":
+        return extract_pdf_text(
+            data
+        )
+
+    if extension == ".docx":
+        return extract_docx_text(
+            data
+        )
+
+    if extension in {
+        ".xlsx",
+        ".xlsm",
+        ".xltx",
+        ".xltm",
+    }:
+        return extract_xlsx_text(
+            data
+        )
+
+    if extension in {
+        ".pptx",
+        ".ppsx",
+        ".potx",
+    }:
+        return extract_pptx_text(
+            data
+        )
+
+    if extension in {
+        ".csv",
+        ".tsv",
+    }:
+        return extract_csv_or_tsv_text(
+            data,
+            extension,
+        )
+
+    if (
+        extension in TEXT_EXTENSIONS
+        or lower_name in {
+            "dockerfile",
+            "makefile",
+            "requirements.txt",
+            "readme",
+            "license",
+        }
+        or (
+            content_type
+            and (
+                content_type.startswith(
+                    "text/"
+                )
+                or content_type in {
+                    "application/json",
+                    "application/xml",
+                    "application/javascript",
+                    "application/sql",
+                    "application/x-yaml",
+                    "application/yaml",
+                }
+            )
+        )
+    ):
+        return truncate_document_text(
+            decode_text_bytes(
+                data
+            )
+        )
+
+    # Last-resort safe text attempt for unknown, non-binary-looking files.
+    # Reject if the sample contains too many NUL bytes.
+    sample = data[:4096]
+
+    if (
+        sample
+        and sample.count(
+            b"\x00"
+        )
+        <= max(
+            1,
+            len(sample) // 100,
+        )
+    ):
+        guessed_text = truncate_document_text(
+            decode_text_bytes(
+                data
+            )
+        )
+
+        if guessed_text.strip():
+            return guessed_text
+
+    raise HTTPException(
+        status_code=415,
+        detail=(
+            "Unsupported file type. Supported formats include PDF, "
+            "DOCX, XLSX/XLSM, PPTX, CSV/TSV, Markdown, JSON, XML, "
+            "YAML, HTML, source code, logs, configuration files, "
+            "and ordinary text files."
+        ),
+    )
+
+
+def build_document_prompt(
+    *,
+    filename: str,
+    document_text: str,
+    question: str,
+) -> str:
+    return f"""
+The user uploaded a document.
+
+FILE:
+{filename}
+
+DOCUMENT CONTENT:
+{document_text}
+
+USER QUESTION:
+{question}
+
+Instructions:
+- Answer the user's question using the uploaded document as the primary source.
+- Do not claim the document contains information that is not present.
+- If the question is document-specific and the document does not provide enough
+  information, clearly say that the document does not contain enough information.
+- Preserve technical terminology, equations, identifiers, values, and names
+  exactly when relevant.
+""".strip()
+
+
 # ============================================================
 # Routes
 # ============================================================
@@ -925,13 +1599,15 @@ async def health() -> dict:
     }
 
 
-@app.post("/api/chat")
-async def chat(
-    request_body: ChatRequest,
+@app.post("/api/chat/file")
+async def chat_with_file(
     request: Request,
+    message: str = Form(""),
+    language: str = Form("en"),
+    file: UploadFile = File(...),
 ):
     # --------------------------------------------------------
-    # Validate before StreamingResponse starts
+    # Validate request before streaming begins
     # --------------------------------------------------------
 
     enforce_rate_limit(
@@ -948,14 +1624,17 @@ async def chat(
         )
 
     user_message = (
-        request_body.message
+        message
         .strip()
     )
 
     if not user_message:
         raise HTTPException(
             status_code=422,
-            detail="Message cannot be empty.",
+            detail=(
+                "Please enter a question or instruction "
+                "for the uploaded file."
+            ),
         )
 
     if (
@@ -971,10 +1650,87 @@ async def chat(
             ),
         )
 
-    print(
-        f"AI Chat request language="
-        f"{request_body.language}"
+    if language not in {
+        "en",
+        "km",
+    }:
+        raise HTTPException(
+            status_code=422,
+            detail="Unsupported language.",
+        )
+
+    filename = (
+        file.filename
+        or "uploaded-file"
     )
+
+    content_type = (
+        file.content_type
+        or "application/octet-stream"
+    )
+
+    data = await file.read()
+
+    try:
+        await file.close()
+    except Exception:
+        pass
+
+    if not data:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "The uploaded file is empty."
+            ),
+        )
+
+    if (
+        len(data)
+        > MAX_FILE_BYTES
+    ):
+        max_mb = (
+            MAX_FILE_BYTES
+            / (1024 * 1024)
+        )
+
+        raise HTTPException(
+            status_code=413,
+            detail=(
+                "The uploaded file is too large. "
+                f"Maximum size is {max_mb:.0f} MB."
+            ),
+        )
+
+    print(
+        "AI Chat file upload:",
+        {
+            "filename":
+                filename,
+            "content_type":
+                content_type,
+            "size_bytes":
+                len(data),
+            "language":
+                language,
+        },
+    )
+
+    document_text = (
+        extract_uploaded_file_text(
+            filename,
+            content_type,
+            data,
+        )
+    )
+
+    if not document_text.strip():
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "No readable text could be extracted "
+                "from the uploaded file."
+            ),
+        )
 
     # --------------------------------------------------------
     # Browser-facing NDJSON generator
@@ -982,22 +1738,17 @@ async def chat(
 
     async def browser_stream():
         try:
-            # Immediately flush one event so the browser knows
-            # that the streaming connection is established.
             yield ndjson_event(
                 "start",
-                language=request_body.language,
+                language=language,
+                filename=filename,
             )
 
             # ====================================================
             # KHMER MODE
-            #
-            # 1. Khmer -> English (non-streaming, short stage)
-            # 2. Main AI reasoning in English (non-streaming)
-            # 3. English -> Khmer (STREAMED to browser)
             # ====================================================
 
-            if request_body.language == "km":
+            if language == "km":
 
                 yield ndjson_event(
                     "status",
@@ -1008,11 +1759,6 @@ async def chat(
                     await translate_khmer_to_english(
                         user_message
                     )
-                )
-
-                print(
-                    "Khmer -> English:",
-                    english_question[:500],
                 )
 
                 yield ndjson_event(
@@ -1033,7 +1779,11 @@ async def chat(
                             "user",
 
                         "content":
-                            english_question,
+                            build_document_prompt(
+                                filename=filename,
+                                document_text=document_text,
+                                question=english_question,
+                            ),
                     },
                 ]
 
@@ -1076,10 +1826,9 @@ async def chat(
                     thinking="low",
                 ):
                     if (
-                        event_type ==
-                        "thinking"
+                        event_type
+                        == "thinking"
                     ):
-                        # Hidden reasoning heartbeat.
                         yield ndjson_event(
                             "status",
                             stage="translating_answer",
@@ -1087,8 +1836,8 @@ async def chat(
                         continue
 
                     if (
-                        event_type ==
-                        "content"
+                        event_type
+                        == "content"
                         and content
                     ):
                         content_seen = True
@@ -1108,23 +1857,15 @@ async def chat(
                     "done",
                     language="km",
                     model=OLLAMA_MODEL,
-                    pipeline="km->en->AI->km",
+                    pipeline="file->km->en->AI->km",
+                    filename=filename,
                 )
 
                 return
 
             # ====================================================
             # ENGLISH MODE
-            #
-            # Stream visible answer chunks immediately.
-            # Hidden reasoning chunks become heartbeat/status
-            # events so the frontend's idle timeout stays alive.
             # ====================================================
-
-            history = clean_history(
-                request_body.history,
-                user_message,
-            )
 
             messages = [
                 {
@@ -1134,15 +1875,16 @@ async def chat(
                     "content":
                         build_system_prompt(),
                 },
-
-                *history,
-
                 {
                     "role":
                         "user",
 
                     "content":
-                        user_message,
+                        build_document_prompt(
+                            filename=filename,
+                            document_text=document_text,
+                            question=user_message,
+                        ),
                 },
             ]
 
@@ -1161,11 +1903,9 @@ async def chat(
                 thinking=get_thinking_setting(),
             ):
                 if (
-                    event_type ==
-                    "thinking"
+                    event_type
+                    == "thinking"
                 ):
-                    # Do not expose the reasoning text.
-                    # This event only keeps the stream active.
                     yield ndjson_event(
                         "status",
                         stage="reasoning",
@@ -1173,8 +1913,8 @@ async def chat(
                     continue
 
                 if (
-                    event_type ==
-                    "content"
+                    event_type
+                    == "content"
                     and content
                 ):
                     content_seen = True
@@ -1194,24 +1934,24 @@ async def chat(
                 "done",
                 language="en",
                 model=OLLAMA_MODEL,
-                pipeline="direct-stream",
+                pipeline="file->AI",
+                filename=filename,
             )
 
         except Exception as exc:
             print(
-                "AI Chat streaming error:",
+                "AI Chat file-streaming error:",
                 repr(exc),
             )
 
-            public_message = str(
-                exc
-            ).strip()
-
-            if not public_message:
-                public_message = (
-                    "The AI service encountered "
-                    "an error. Please try again."
+            public_message = (
+                str(exc)
+                .strip()
+                or (
+                    "The AI service encountered an "
+                    "error while processing the file."
                 )
+            )
 
             yield ndjson_event(
                 "error",
@@ -1225,15 +1965,12 @@ async def chat(
             "charset=utf-8"
         ),
         headers={
-            # Prevent browser/proxy caching or transformation.
             "Cache-Control":
                 "no-cache, no-transform",
 
-            # Helpful for reverse proxies that honor this header.
             "X-Accel-Buffering":
                 "no",
 
-            # Make the streaming content type explicit.
             "Content-Type":
                 "application/x-ndjson; charset=utf-8",
         },
