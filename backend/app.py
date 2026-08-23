@@ -299,6 +299,11 @@ class ChatRequest(BaseModel):
         "km",
     ] = "en"
 
+    visitor_id: str | None = Field(
+        default=None,
+        max_length=128,
+    )
+
 
 # ============================================================
 # FastAPI
@@ -310,7 +315,7 @@ app = FastAPI(
         "General-purpose bilingual English/Khmer AI chat "
         "interface backed by Ollama Cloud."
     ),
-    version="7.2.0",
+    version="7.3.0",
 )
 
 
@@ -393,6 +398,90 @@ def enforce_rate_limit(
         )
 
     timestamps.append(now)
+
+
+# ============================================================
+# Anonymous aggregate usage statistics
+# ============================================================
+
+# In-memory statistics reset whenever this Render process restarts.
+# No IP addresses, prompts, filenames, or message content are stored here.
+user_last_seen: dict[str, float] = {}
+tracked_users: set[str] = set()
+usage_counters = {
+    "total_queries": 0,
+    "text_queries": 0,
+    "file_queries": 0,
+    "english_queries": 0,
+    "khmer_queries": 0,
+}
+
+
+def normalize_visitor_id(
+    visitor_id: str | None,
+) -> str:
+    if not visitor_id:
+        return ""
+
+    value = visitor_id.strip()[:128]
+
+    # Keep only a conservative set of characters. Browser-generated UUIDs
+    # and the fallback identifier both fit this pattern.
+    if not value:
+        return ""
+
+    if not all(
+        character.isalnum()
+        or character in {"-", "_", ".", ":"}
+        for character in value
+    ):
+        return ""
+
+    return value
+
+
+def record_usage(
+    visitor_id: str | None,
+    *,
+    language: str,
+    with_file: bool,
+) -> None:
+    now = time.time()
+    normalized_id = normalize_visitor_id(
+        visitor_id
+    )
+
+    usage_counters["total_queries"] += 1
+
+    if with_file:
+        usage_counters["file_queries"] += 1
+    else:
+        usage_counters["text_queries"] += 1
+
+    if language == "km":
+        usage_counters["khmer_queries"] += 1
+    else:
+        usage_counters["english_queries"] += 1
+
+    if normalized_id:
+        tracked_users.add(
+            normalized_id
+        )
+        user_last_seen[
+            normalized_id
+        ] = now
+
+
+def count_active_users(
+    window_seconds: int,
+) -> int:
+    now = time.time()
+
+    return sum(
+        1
+        for last_seen in user_last_seen.values()
+        if now - last_seen <= window_seconds
+    )
 
 
 # ============================================================
@@ -1597,10 +1686,46 @@ async def health() -> dict:
         "routes": [
             "/api/chat",
             "/api/chat/file",
+            "/api/stats",
         ],
 
         "khmer_pipeline":
             "km->en->AI->km",
+    }
+
+
+@app.get("/api/stats")
+async def stats() -> dict:
+    return {
+        "active_users_5m":
+            count_active_users(5 * 60),
+
+        "active_users_15m":
+            count_active_users(15 * 60),
+
+        "active_users_60m":
+            count_active_users(60 * 60),
+
+        "tracked_users":
+            len(tracked_users),
+
+        "total_queries":
+            usage_counters["total_queries"],
+
+        "text_queries":
+            usage_counters["text_queries"],
+
+        "file_queries":
+            usage_counters["file_queries"],
+
+        "english_queries":
+            usage_counters["english_queries"],
+
+        "khmer_queries":
+            usage_counters["khmer_queries"],
+
+        "persistence":
+            "in-memory; resets on service restart or redeploy",
     }
 
 
@@ -1633,6 +1758,12 @@ async def chat(
                 f"Please keep it below {MAX_USER_CHARACTERS} characters."
             ),
         )
+
+    record_usage(
+        request_body.visitor_id,
+        language=request_body.language,
+        with_file=False,
+    )
 
     print(
         "AI Chat request:",
@@ -1815,6 +1946,7 @@ async def chat_with_file(
     request: Request,
     message: str = Form(""),
     language: str = Form("en"),
+    visitor_id: str = Form(""),
     file: UploadFile = File(...),
 ):
     # document-upload streaming chat
@@ -1872,6 +2004,12 @@ async def chat_with_file(
             status_code=422,
             detail="Unsupported language.",
         )
+
+    record_usage(
+        visitor_id,
+        language=language,
+        with_file=True,
+    )
 
     filename = (
         file.filename
