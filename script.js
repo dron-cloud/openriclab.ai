@@ -277,6 +277,50 @@
     ""
   ).trim();
 
+  // Anonymous browser identifier for aggregate usage statistics.
+  // Stored locally in this browser; no personal information is collected.
+  const VISITOR_ID_STORAGE_KEY =
+    "openriclab_ai_visitor_id";
+
+  const createVisitorId = () => {
+    if (
+      window.crypto &&
+      typeof window.crypto.randomUUID ===
+        "function"
+    ) {
+      return window.crypto.randomUUID();
+    }
+
+    return (
+      "visitor-" +
+      Date.now().toString(36) +
+      "-" +
+      Math.random().toString(36).slice(2) +
+      Math.random().toString(36).slice(2)
+    );
+  };
+
+  let visitorId =
+    window.localStorage.getItem(
+      VISITOR_ID_STORAGE_KEY
+    );
+
+  if (!visitorId) {
+    visitorId = createVisitorId();
+
+    try {
+      window.localStorage.setItem(
+        VISITOR_ID_STORAGE_KEY,
+        visitorId
+      );
+    } catch (error) {
+      console.warn(
+        "Could not persist anonymous visitor ID:",
+        error
+      );
+    }
+  }
+
   const fileInput =
     document.getElementById(
       "copilot-file-input"
@@ -1134,6 +1178,11 @@
             );
 
             formData.append(
+              "visitor_id",
+              visitorId
+            );
+
+            formData.append(
               "file",
               fileForRequest,
               fileForRequest.name
@@ -1183,7 +1232,10 @@
                         historyForRequest,
 
                       language:
-                        requestLanguage
+                        requestLanguage,
+
+                      visitor_id:
+                        visitorId
                     }),
 
                   signal:
