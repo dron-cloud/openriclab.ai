@@ -500,36 +500,110 @@
 
         </div>
 
-          <article class="featured-card reveal">
-            <div class="featured-badge">Security · O-RAN</div>
-            <h3>O-RAN Security Intelligence</h3>
-            <p>
-              A systems-oriented security research program spanning Open Fronthaul protection, privacy leakage,
-              cross-vendor integration, RIC application trust, and AI-assisted vulnerability testing.
-            </p>
-            <div class="security-chain" aria-label="O-RAN security scope">
-              <span>O-RU</span><i>↔</i><span>O-DU/O-CU</span><i>↔</i><span>Near-RT RIC</span><i>↔</i><span>Non-RT RIC</span>
-            </div>
-            <div class="card-links"><a href="#publications">Security Work →</a></div>
-          </article>
 
-          <article class="featured-card space-feature reveal">
-            <div class="featured-badge">Space Networking · IEEE INFOCOM</div>
-            <h3>SpaceNet &amp; Dynamic LEO Topology Design</h3>
-            <p>
-              Time-dependent topology optimization and routing for dynamic LEO satellite networks using realistic
-              constellation data, inter-satellite links, and end-to-end network metrics.
-            </p>
-            <div class="space-metrics">
-              <div><strong>907</strong><span>LEO satellites evaluated</span></div>
-              <div><strong>70.47%</strong><span>capacity gain vs. +Grid</span></div>
-              <div><strong>5 vs. 22</strong><span>NY–SF hops</span></div>
+          <!-- SkyShare System Description -->
+      <div class="featured-grid">
+
+        <!-- SkyShare System Description -->
+        <article class="featured-card featured-primary reveal">
+          <div class="featured-badge">LEO · Spectrum Sharing · Radio Astronomy</div>
+
+          <h3>
+            SkyShare: Constellation-Wide Sky Sharing for
+            LEO–Radio Astronomy Coexistence
+          </h3>
+
+          <div class="project-story">
+
+            <div>
+              <strong>Goal</strong>
+              <p>
+                Protect sensitive radio astronomy observations from harmful
+                LEO satellite interference while preserving broadband coverage
+                for users near radio astronomy sites.
+              </p>
             </div>
-            <div class="card-links">
-              <a href="#spacenet-demo">Watch Demo →</a>
-              <a href="https://arxiv.org/abs/2501.13280" target="_blank" rel="noopener noreferrer">Read Paper ↗</a>
+
+            <div>
+              <strong>System Development</strong>
+              <p>
+                Developed SkyShare, a predictive control-plane system integrating
+                satellite orbital prediction, real-time radio astronomy observation
+                data, ITU-compliant EPFD interference modeling, and SkySched for
+                constellation-wide spot-beam scheduling.
+              </p>
             </div>
-          </article>
+
+            <div>
+              <strong>Results</strong>
+              <p>
+                Evaluated using real Starlink Gen2-mini constellation geometries
+                and 25 Ku-band radio astronomy sites worldwide. SkyShare reduces
+                unserved cells by up to 90.68% compared with existing boresight
+                avoidance while maintaining EPFD compliance.
+              </p>
+            </div>
+
+          </div>
+
+          <div class="metric-row">
+            <div>
+              <strong>25</strong>
+              <span>RAS sites</span>
+            </div>
+            <div>
+              <strong>90.68%</strong>
+              <span>fewer unserved cells</span>
+            </div>
+            <div>
+              <strong>No</strong>
+              <span>hardware modifications</span>
+            </div>
+          </div>
+
+          <div class="card-links">
+            <a href="#publications">ACM MobiCom 2026 →</a>
+          </div>
+        </article>
+
+
+        <!-- SkyShare Figure -->
+        <article class="featured-card reveal">
+          <div class="featured-badge">LEO · RAS Coexistence</div>
+
+          <h3>SkyShare System</h3>
+
+          <div class="project-figure">
+            <img
+              src="skyshare.png"
+              alt="SkyShare constellation-wide LEO radio astronomy coexistence system"
+              loading="lazy"
+            />
+          </div>
+
+          <div class="experimental-setup">
+            <ul>
+              <li>
+                <p><strong>RAS Awareness:</strong> ODS observation metadata,
+                including location, schedule, frequency band, and telescope direction</p>
+              </li>
+              <li>
+                <p><strong>Constellation State:</strong> TLE-based satellite
+                position and cell-visibility prediction</p>
+              </li>
+              <li>
+                <p><strong>Interference:</strong> ITU-compliant EPFD modeling
+                with an EPFD-budgeted Region of Interest</p>
+              </li>
+              <li>
+                <p><strong>Scheduling:</strong> SkySched constellation-wide
+                satellite beam–cell assignment</p>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
         </div>
       </div>
     </section>
