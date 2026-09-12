@@ -408,38 +408,87 @@
           </p>
         </div>
 
+
         <div class="featured-grid">
+          <!-- System Description -->
           <article class="featured-card featured-primary reveal">
-            <div class="featured-badge">AI-RAN · Network Intelligence</div>
-            <h3>xFusion: Scalable Multi-Task Intelligence for Operational RANs</h3>
+            <div class="featured-badge">O-RAN · Security · Y1 Analytics</div>
+
+            <h3>
+              Y1-Aided Intelligent Jamming: Exploiting RAN Analytics for
+              Efficient Interference
+            </h3>
+
             <div class="project-story">
-              <div><strong>Problem</strong><p>Deploying isolated AI models for every cell, KPM, and network task creates excessive compute, memory, and lifecycle overhead.</p></div>
-              <div><strong>Contribution</strong><p>A unified multi-task xApp architecture for forecasting, traffic classification, health assessment, anomaly detection, and condition diagnosis.</p></div>
-              <div><strong>Evidence</strong><p>Evaluated across 115 operational 5G cells, including 805 KPM forecasting tasks, with near-real-time execution.</p></div>
+
+              <div>
+                <strong>Goal</strong>
+                <p>
+                  Investigate whether RAN analytics exposed through the O-RAN Y1
+                  interface can be exploited by a compromised consumer to enable
+                  targeted and resource-efficient wireless interference.
+                </p>
+              </div>
+
+              <div>
+                <strong>System Development</strong>
+                <p>
+                  Developed an end-to-end over-the-air O-RAN security testbed
+                  integrating a near-RT RIC, KPM xApp, Y1 Producer/Consumer,
+                  srsRAN-based RAN and core, GNU Radio jammer, and USRP B210 radios,
+                  with threshold- and DBSCAN-based traffic-aware jamming strategies.
+                </p>
+              </div>
+
+              <div>
+                <strong>Results</strong>
+                <p>
+                  Y1-guided jamming achieved disruption close to always-on jamming
+                  while reducing jammer activity by 27%. Under constrained budgets,
+                  traffic-aware clustering caused up to an 18.1% bitrate drop while
+                  transmitting only 25% of the time.
+                </p>
+              </div>
+
             </div>
+
             <div class="metric-row">
-              <div><strong>115</strong><span>5G cells</span></div>
-              <div><strong>805</strong><span>forecast tasks</span></div>
-              <div><strong>&lt; 750 ms</strong><span>near-RT budget</span></div>
+              <div>
+                <strong>27%</strong>
+                <span>less jammer activity</span>
+              </div>
+              <div>
+                <strong>18.1%</strong>
+                <span>bitrate drop</span>
+              </div>
+              <div>
+                <strong>25%</strong>
+                <span>jamming budget</span>
+              </div>
             </div>
+
             <div class="card-links">
-              <a href="#publications">Related Publications →</a>
+              <a href="#publications">IEEE MILCOM 2025 →</a>
               <a href="#infrastructure">Experimental Platform →</a>
             </div>
           </article>
 
+          <!-- Y1 Security Testbed -->
           <article class="featured-card reveal">
-            <div class="featured-badge">AI-RAN · Compute Orchestration</div>
-            <h3>GPU-Aware AI &amp; RAN Workload Orchestration</h3>
-            <p>
-              Jointly coordinates communication and AI workloads across shared edge compute resources while
-              respecting latency, power, service-level, and admission constraints.
-            </p>
-            <div class="mini-flow" aria-label="AI-RAN orchestration flow">
-              <span>RAN + AI Workloads</span><i>→</i><span>Resource Intelligence</span><i>→</i><span>GPU/CPU Allocation</span><i>→</i><span>SLA-Aware Control</span>
+            <div class="featured-badge">O-RAN · Security</div>
+
+            <h3>Y1 Security Testbed</h3>
+
+            <div class="project-figure">
+              <img
+                src="jamming.png"
+                alt="O-RAN Y1 security experimental testbed"
+                loading="lazy"
+              />
             </div>
-            <div class="card-links"><a href="#funding">AI-RAN Research →</a></div>
           </article>
+
+        </div>
 
           <article class="featured-card reveal">
             <div class="featured-badge">Security · O-RAN</div>
