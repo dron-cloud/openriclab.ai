@@ -604,6 +604,121 @@
         </article>
 
       </div>
+
+      <div class="featured-grid">
+
+      <!-- O-NIIS System Description -->
+      <article class="featured-card featured-primary reveal">
+        <div class="featured-badge">O-RAN · IRS · SWIPT · AI</div>
+
+        <h3>
+          O-NIIS: Open and Intelligent IRS-SWIPT for
+          Wireless Energy-Efficiency Enhancement
+        </h3>
+
+        <div class="project-story">
+
+          <div>
+            <strong>Goal</strong>
+            <p>
+              Integrate IRS, SWIPT, and AI within an open and programmable
+              O-RAN architecture to improve wireless energy efficiency while
+              satisfying network throughput requirements.
+            </p>
+          </div>
+
+          <div>
+            <strong>System Development</strong>
+            <p>
+              Developed O-NIIS, an O-RAN-based framework integrating IRS and
+              SWIPT with a near-RT RIC and an unsupervised DNN (uDNN) xApp.
+              The uDNN jointly optimizes active beamforming at the gNB and
+              passive beamforming at the IRS using network CSI.
+            </p>
+          </div>
+
+          <div>
+            <strong>Results</strong>
+            <p>
+              The proposed uDNN outperforms DQN, alternating optimization,
+              and fixed beamforming, while achieving energy efficiency close
+              to the global optimum obtained by exhaustive search with
+              substantially lower computational complexity.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="metric-row">
+          <div>
+            <strong>≈360 ms</strong>
+            <span>uDNN training</span>
+          </div>
+          <div>
+            <strong>&lt;750 ms</strong>
+            <span>E2 latency budget</span>
+          </div>
+          <div>
+            <strong>Near-Optimal</strong>
+            <span>energy efficiency</span>
+          </div>
+        </div>
+
+        <div class="card-links">
+          <a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=11614175">IEEE TVT 2026 →</a>
+        </div>
+      </article>
+
+
+      <!-- O-NIIS Figure -->
+      <article class="featured-card reveal">
+        <div class="featured-badge">O-RAN · Intelligent Wireless Environment</div>
+
+        <h3>O-NIIS System</h3>
+
+        <div class="project-figure">
+          <img
+            src="o-niis.pdf"
+            alt="O-NIIS O-RAN IRS-SWIPT system architecture"
+            loading="lazy"
+          />
+        </div>
+
+        <div class="experimental-setup">
+          <ul>
+            <li>
+              <p>
+                <strong>O-RAN:</strong> O-RU, O-DU, O-CU, and near-RT RIC
+                interconnected through open O-Fronthaul, F1, and E2 interfaces
+              </p>
+            </li>
+
+            <li>
+              <p>
+                <strong>AI Control:</strong> uDNN xApp deployed on the near-RT
+                RIC for intelligent beamforming optimization
+              </p>
+            </li>
+
+            <li>
+              <p>
+                <strong>IRS:</strong> Programmable reflecting elements controlled
+                by the near-RT RIC to redirect RF signals toward UEs
+              </p>
+            </li>
+
+            <li>
+              <p>
+                <strong>SWIPT:</strong> UE power splitting for simultaneous
+                information decoding and RF energy harvesting
+              </p>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+    </div>
+
         </div>
       </div>
     </section>
