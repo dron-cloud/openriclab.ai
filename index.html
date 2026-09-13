@@ -604,6 +604,138 @@
 
         </div>
 
+        <!-- DoTD -->
+        <div class="featured-grid">
+
+          <!-- DoTD System Description -->
+          <article class="featured-card featured-primary reveal">
+            <div class="featured-badge">
+              LEO · Dynamic Topology · ISL · Space Networks
+            </div>
+
+            <h3>
+              DoTD: Time-Dependent Network Topology Optimization
+              for LEO Satellite Constellations
+            </h3>
+
+            <div class="project-story">
+
+              <div>
+                <strong>Goal</strong>
+                <p>
+                  Address the limitations of static neighbor-based LEO topologies
+                  by dynamically optimizing inter-satellite links as satellite
+                  positions and network conditions evolve over time.
+                </p>
+              </div>
+
+              <div>
+                <strong>System Development</strong>
+                <p>
+                  Developed DoTD, a Dynamic Time-Expanded Graph-based topology
+                  optimization framework that jointly considers network capacity,
+                  latency, and link churn to select high-performance ISLs over time.
+                </p>
+              </div>
+
+              <div>
+                <strong>Results</strong>
+                <p>
+                  Evaluated using Starlink TLE data and the SpaceNet LEO network
+                  emulator. Compared with +Grid, DoTD improves network capacity
+                  by up to 70.47%, reduces hop count by up to 81.82%, and reduces
+                  latency by up to 96.61%.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="metric-row">
+              <div>
+                <strong>+70.47%</strong>
+                <span>network capacity</span>
+              </div>
+
+              <div>
+                <strong>−81.82%</strong>
+                <span>hop count</span>
+              </div>
+
+              <div>
+                <strong>−96.61%</strong>
+                <span>network latency</span>
+              </div>
+            </div>
+
+            <div class="card-links">
+              <a href="https://ieeexplore.ieee.org/abstract/document/11044725">IEEE INFOCOM →</a>
+
+              <a
+                href="https://github.com/SpaceNetTestbed-public"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                SpaceNet Open Source →
+              </a>
+            </div>
+          </article>
+
+
+          <!-- DoTD Figure -->
+          <article class="featured-card reveal">
+            <div class="featured-badge">
+              Dynamic Time-Expanded Graph · OSPF · Starlink TLE
+            </div>
+
+            <h3>Dynamic LEO Topology Optimization</h3>
+
+            <div class="project-figure">
+              <img
+                src="Fig3.png"
+                alt="DoTD dynamic time-dependent LEO satellite topology optimization"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="experimental-setup">
+              <ul>
+
+                <li>
+                  <p>
+                    <strong>Constellation:</strong>
+                    907 Starlink LEO satellites generated from real TLE orbital data
+                  </p>
+                </li>
+
+                <li>
+                  <p>
+                    <strong>ISL Configuration:</strong>
+                    Four inter-satellite links per satellite with a 7,000 km maximum range
+                  </p>
+                </li>
+
+                <li>
+                  <p>
+                    <strong>Network Emulation:</strong>
+                    SpaceNet/xeoverse-based LEO network emulation with OSPF routing
+                  </p>
+                </li>
+
+                <li>
+                  <p>
+                    <strong>Evaluation:</strong>
+                    Five global source-destination scenarios comparing DoTD,
+                    Greedy, and +Grid
+                  </p>
+                </li>
+
+              </ul>
+            </div>
+
+          </article>
+
+        </div>
+
         <div class="featured-grid">
 
           <!-- O-NIIS System Description -->
@@ -1476,7 +1608,7 @@
       </div>
     </section>
 
-    
+
     <!-- CONTACT -->
     <section class="contact-section" id="contact">
       <div class="container contact-layout reveal">
