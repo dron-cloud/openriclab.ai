@@ -497,227 +497,347 @@
               </ul>
             </div>
           </article>
-
         </div>
 
 
           <!-- SkyShare System Description -->
-      <div class="featured-grid">
+        <div class="featured-grid">
 
-        <!-- SkyShare System Description -->
-        <article class="featured-card featured-primary reveal">
-          <div class="featured-badge">LEO · Spectrum Sharing · Radio Astronomy</div>
+          <!-- SkyShare System Description -->
+          <article class="featured-card featured-primary reveal">
+            <div class="featured-badge">LEO · Spectrum Sharing · Radio Astronomy</div>
 
-          <h3>
-            SkyShare: Constellation-Wide Sky Sharing for
-            LEO–Radio Astronomy Coexistence
-          </h3>
+            <h3>
+              SkyShare: Constellation-Wide Sky Sharing for
+              LEO–Radio Astronomy Coexistence
+            </h3>
 
-          <div class="project-story">
+            <div class="project-story">
 
-            <div>
-              <strong>Goal</strong>
-              <p>
-                Protect sensitive radio astronomy observations from harmful
-                LEO satellite interference while preserving broadband coverage
-                for users near radio astronomy sites.
-              </p>
+              <div>
+                <strong>Goal</strong>
+                <p>
+                  Protect sensitive radio astronomy observations from harmful
+                  LEO satellite interference while preserving broadband coverage
+                  for users near radio astronomy sites.
+                </p>
+              </div>
+
+              <div>
+                <strong>System Development</strong>
+                <p>
+                  Developed SkyShare, a predictive control-plane system integrating
+                  satellite orbital prediction, real-time radio astronomy observation
+                  data, ITU-compliant EPFD interference modeling, and SkySched for
+                  constellation-wide spot-beam scheduling.
+                </p>
+              </div>
+
+              <div>
+                <strong>Results</strong>
+                <p>
+                  Evaluated using real Starlink Gen2-mini constellation geometries
+                  and 25 Ku-band radio astronomy sites worldwide. SkyShare reduces
+                  unserved cells by up to 90.68% compared with existing boresight
+                  avoidance while maintaining EPFD compliance.
+                </p>
+              </div>
+
             </div>
 
-            <div>
-              <strong>System Development</strong>
-              <p>
-                Developed SkyShare, a predictive control-plane system integrating
-                satellite orbital prediction, real-time radio astronomy observation
-                data, ITU-compliant EPFD interference modeling, and SkySched for
-                constellation-wide spot-beam scheduling.
-              </p>
+            <div class="metric-row">
+              <div>
+                <strong>25</strong>
+                <span>RAS sites</span>
+              </div>
+              <div>
+                <strong>90.68%</strong>
+                <span>fewer unserved cells</span>
+              </div>
+              <div>
+                <strong>No</strong>
+                <span>hardware modifications</span>
+              </div>
             </div>
 
-            <div>
-              <strong>Results</strong>
-              <p>
-                Evaluated using real Starlink Gen2-mini constellation geometries
-                and 25 Ku-band radio astronomy sites worldwide. SkyShare reduces
-                unserved cells by up to 90.68% compared with existing boresight
-                avoidance while maintaining EPFD compliance.
-              </p>
+            <div class="card-links">
+              <a href="https://arxiv.org/pdf/2609.00821">ACM MobiCom 2026 →</a>
+            </div>
+          </article>
+
+
+          <!-- SkyShare Figure -->
+          <article class="featured-card reveal">
+            <div class="featured-badge">LEO · RAS Coexistence</div>
+
+            <h3>SkyShare System</h3>
+
+            <div class="project-figure">
+              <img
+                src="skyshare.png"
+                alt="SkyShare constellation-wide LEO radio astronomy coexistence system"
+                loading="lazy"
+              />
             </div>
 
-          </div>
-
-          <div class="metric-row">
-            <div>
-              <strong>25</strong>
-              <span>RAS sites</span>
+            <div class="experimental-setup">
+              <ul>
+                <li>
+                  <p><strong>RAS Awareness:</strong> ODS observation metadata,
+                  including location, schedule, frequency band, and telescope direction</p>
+                </li>
+                <li>
+                  <p><strong>Constellation State:</strong> TLE-based satellite
+                  position and cell-visibility prediction</p>
+                </li>
+                <li>
+                  <p><strong>Interference:</strong> ITU-compliant EPFD modeling
+                  with an EPFD-budgeted Region of Interest</p>
+                </li>
+                <li>
+                  <p><strong>Scheduling:</strong> SkySched constellation-wide
+                  satellite beam–cell assignment</p>
+                </li>
+              </ul>
             </div>
-            <div>
-              <strong>90.68%</strong>
-              <span>fewer unserved cells</span>
-            </div>
-            <div>
-              <strong>No</strong>
-              <span>hardware modifications</span>
-            </div>
-          </div>
-
-          <div class="card-links">
-            <a href="https://arxiv.org/pdf/2609.00821">ACM MobiCom 2026 →</a>
-          </div>
-        </article>
-
-
-        <!-- SkyShare Figure -->
-        <article class="featured-card reveal">
-          <div class="featured-badge">LEO · RAS Coexistence</div>
-
-          <h3>SkyShare System</h3>
-
-          <div class="project-figure">
-            <img
-              src="skyshare.png"
-              alt="SkyShare constellation-wide LEO radio astronomy coexistence system"
-              loading="lazy"
-            />
-          </div>
-
-          <div class="experimental-setup">
-            <ul>
-              <li>
-                <p><strong>RAS Awareness:</strong> ODS observation metadata,
-                including location, schedule, frequency band, and telescope direction</p>
-              </li>
-              <li>
-                <p><strong>Constellation State:</strong> TLE-based satellite
-                position and cell-visibility prediction</p>
-              </li>
-              <li>
-                <p><strong>Interference:</strong> ITU-compliant EPFD modeling
-                with an EPFD-budgeted Region of Interest</p>
-              </li>
-              <li>
-                <p><strong>Scheduling:</strong> SkySched constellation-wide
-                satellite beam–cell assignment</p>
-              </li>
-            </ul>
-          </div>
-        </article>
-
-      </div>
-
-      <div class="featured-grid">
-
-      <!-- O-NIIS System Description -->
-      <article class="featured-card featured-primary reveal">
-        <div class="featured-badge">O-RAN · IRS · SWIPT · AI</div>
-
-        <h3>
-          O-NIIS: Open and Intelligent IRS-SWIPT for
-          Wireless Energy-Efficiency Enhancement
-        </h3>
-
-        <div class="project-story">
-
-          <div>
-            <strong>Goal</strong>
-            <p>
-              Integrate IRS, SWIPT, and AI within an open and programmable
-              O-RAN architecture to improve wireless energy efficiency while
-              satisfying network throughput requirements.
-            </p>
-          </div>
-
-          <div>
-            <strong>System Development</strong>
-            <p>
-              Developed O-NIIS, an O-RAN-based framework integrating IRS and
-              SWIPT with a near-RT RIC and an unsupervised DNN (uDNN) xApp.
-              The uDNN jointly optimizes active beamforming at the gNB and
-              passive beamforming at the IRS using network CSI.
-            </p>
-          </div>
-
-          <div>
-            <strong>Results</strong>
-            <p>
-              The proposed uDNN outperforms DQN, alternating optimization,
-              and fixed beamforming, while achieving energy efficiency close
-              to the global optimum obtained by exhaustive search with
-              substantially lower computational complexity.
-            </p>
-          </div>
+          </article>
 
         </div>
 
-        <div class="metric-row">
-          <div>
-            <strong>≈360 ms</strong>
-            <span>uDNN training</span>
-          </div>
-          <div>
-            <strong>&lt;750 ms</strong>
-            <span>E2 latency budget</span>
-          </div>
-          <div>
-            <strong>Near-Optimal</strong>
-            <span>energy efficiency</span>
-          </div>
+        <div class="featured-grid">
+
+          <!-- O-NIIS System Description -->
+          <article class="featured-card featured-primary reveal">
+            <div class="featured-badge">O-RAN · IRS · SWIPT · AI</div>
+
+            <h3>
+              O-NIIS: Open and Intelligent IRS-SWIPT for
+              Wireless Energy-Efficiency Enhancement
+            </h3>
+
+            <div class="project-story">
+
+              <div>
+                <strong>Goal</strong>
+                <p>
+                  Integrate IRS, SWIPT, and AI within an open and programmable
+                  O-RAN architecture to improve wireless energy efficiency while
+                  satisfying network throughput requirements.
+                </p>
+              </div>
+
+              <div>
+                <strong>System Development</strong>
+                <p>
+                  Developed O-NIIS, an O-RAN-based framework integrating IRS and
+                  SWIPT with a near-RT RIC and an unsupervised DNN (uDNN) xApp.
+                  The uDNN jointly optimizes active beamforming at the gNB and
+                  passive beamforming at the IRS using network CSI.
+                </p>
+              </div>
+
+              <div>
+                <strong>Results</strong>
+                <p>
+                  The proposed uDNN outperforms DQN, alternating optimization,
+                  and fixed beamforming, while achieving energy efficiency close
+                  to the global optimum obtained by exhaustive search with
+                  substantially lower computational complexity.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="metric-row">
+              <div>
+                <strong>≈360 ms</strong>
+                <span>uDNN training</span>
+              </div>
+              <div>
+                <strong>&lt;750 ms</strong>
+                <span>E2 latency budget</span>
+              </div>
+              <div>
+                <strong>Near-Optimal</strong>
+                <span>energy efficiency</span>
+              </div>
+            </div>
+
+            <div class="card-links">
+              <a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=11614175">IEEE TVT 2026 →</a>
+            </div>
+          </article>
+
+
+          <!-- O-NIIS Figure -->
+          <article class="featured-card reveal">
+            <div class="featured-badge">O-RAN · Intelligent Wireless Environment</div>
+
+            <h3>O-NIIS System</h3>
+
+            <div class="project-figure">
+              <img
+                src="oniis.png"
+                alt="O-NIIS O-RAN IRS-SWIPT system architecture"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="experimental-setup">
+              <ul>
+                <li>
+                  <p>
+                    <strong>O-RAN:</strong> O-RU, O-DU, O-CU, and near-RT RIC
+                    interconnected through open O-Fronthaul, F1, and E2 interfaces
+                  </p>
+                </li>
+
+                <li>
+                  <p>
+                    <strong>AI Control:</strong> uDNN xApp deployed on the near-RT
+                    RIC for intelligent beamforming optimization
+                  </p>
+                </li>
+
+                <li>
+                  <p>
+                    <strong>IRS:</strong> Programmable reflecting elements controlled
+                    by the near-RT RIC to redirect RF signals toward UEs
+                  </p>
+                </li>
+
+                <li>
+                  <p>
+                    <strong>SWIPT:</strong> UE power splitting for simultaneous
+                    information decoding and RF energy harvesting
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </article>
         </div>
 
-        <div class="card-links">
-          <a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=11614175">IEEE TVT 2026 →</a>
+        <div class="featured-grid">
+          <!-- xFusion System Description -->
+          <article class="featured-card featured-primary reveal">
+            <div class="featured-badge">O-RAN · Scalable AI · Multi-Task Learning</div>
+
+            <h3>
+              xFusion: A Unified Multi-Task RIC Architecture
+              for Scalable O-RAN Intelligence
+            </h3>
+
+            <div class="project-story">
+
+              <div>
+                <strong>Goal</strong>
+                <p>
+                  Address the scalability limitations of today's isolated ML xApps,
+                  where duplicated processing, independent model execution, and
+                  xApp queuing increase closed-loop latency and memory consumption
+                  as the number of RAN intelligence tasks grows.
+                </p>
+              </div>
+
+              <div>
+                <strong>System Development</strong>
+                <p>
+                  Developed xFusion, a unified near-RT RIC architecture based on
+                  one xApp and one shared multi-task model for multiple RAN
+                  intelligence tasks. The shared execution pipeline eliminates
+                  redundant KPM preprocessing, duplicated feature extraction,
+                  and repeated model execution across isolated xApps.
+                </p>
+              </div>
+
+              <div>
+                <strong>Results</strong>
+                <p>
+                  At 115 cells, isolated ML xApps reach 2.33 s closed-loop
+                  latency and consume 4.99 GB of memory. xFusion reduces
+                  closed-loop latency to 205 ms and resident memory to
+                  approximately 0.62 GB, while remaining within the
+                  near-RT RIC E2 latency budget.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="metric-row">
+              <div>
+                <strong>2.33 s → 205 ms</strong>
+                <span>closed-loop latency</span>
+              </div>
+
+              <div>
+                <strong>4.99 → 0.62 GB</strong>
+                <span>resident memory</span>
+              </div>
+
+              <div>
+                <strong>≈8×</strong>
+                <span>memory reduction</span>
+              </div>
+            </div>
+
+            <div class="card-links">
+              <a href="#publications">IEEE INFOCOM →</a>
+            </div>
+          </article>
+
+
+          <!-- xFusion Figure -->
+          <article class="featured-card reveal">
+            <div class="featured-badge">One xApp · One Model · All Tasks</div>
+
+            <h3>Scalable xFusion Architecture</h3>
+
+            <div class="project-figure">
+              <img
+                src="xfusion.png"
+                alt="xFusion scalable unified multi-task RIC architecture"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="experimental-setup">
+              <ul>
+
+                <li>
+                  <p>
+                    <strong>Problem:</strong> Hundreds of isolated ML xApps
+                    introduce queuing, duplicated preprocessing, repeated feature
+                    extraction, and independent model execution
+                  </p>
+                </li>
+
+                <li>
+                  <p>
+                    <strong>Unified Execution:</strong> One xApp and one shared
+                    model process KPM streams for multiple RAN intelligence tasks
+                  </p>
+                </li>
+
+                <li>
+                  <p>
+                    <strong>Latency:</strong> 205 ms closed-loop latency at
+                    115 cells, compared with 2.33 s for isolated ML xApps
+                  </p>
+                </li>
+
+                <li>
+                  <p>
+                    <strong>Memory:</strong> Approximately 0.62 GB resident
+                    memory, compared with 4.99 GB for isolated ML xApps
+                  </p>
+                </li>
+
+              </ul>
+            </div>
+
+          </article>
+
         </div>
-      </article>
-
-
-      <!-- O-NIIS Figure -->
-      <article class="featured-card reveal">
-        <div class="featured-badge">O-RAN · Intelligent Wireless Environment</div>
-
-        <h3>O-NIIS System</h3>
-
-        <div class="project-figure">
-          <img
-            src="o-niis.pdf"
-            alt="O-NIIS O-RAN IRS-SWIPT system architecture"
-            loading="lazy"
-          />
-        </div>
-
-        <div class="experimental-setup">
-          <ul>
-            <li>
-              <p>
-                <strong>O-RAN:</strong> O-RU, O-DU, O-CU, and near-RT RIC
-                interconnected through open O-Fronthaul, F1, and E2 interfaces
-              </p>
-            </li>
-
-            <li>
-              <p>
-                <strong>AI Control:</strong> uDNN xApp deployed on the near-RT
-                RIC for intelligent beamforming optimization
-              </p>
-            </li>
-
-            <li>
-              <p>
-                <strong>IRS:</strong> Programmable reflecting elements controlled
-                by the near-RT RIC to redirect RF signals toward UEs
-              </p>
-            </li>
-
-            <li>
-              <p>
-                <strong>SWIPT:</strong> UE power splitting for simultaneous
-                information decoding and RF energy harvesting
-              </p>
-            </li>
-          </ul>
-        </div>
-      </article>
-
-    </div>
 
         </div>
       </div>
