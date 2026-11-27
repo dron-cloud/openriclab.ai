@@ -11,6 +11,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Standalone book feature; inherits the site's typography and palette. */
+    .book-layout { display: grid; grid-template-columns: minmax(220px, .75fr) minmax(0, 1.55fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
+    .book-cover-figure { margin: 0; max-width: 390px; }
+    .book-cover-image { display: block; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 18px 45px rgba(0, 0, 0, .16); }
+    .book-copy h2 { margin-bottom: 16px; }
+    .book-copy p { margin-bottom: 18px; }
+    .book-topics { display: flex; flex-wrap: wrap; gap: 9px; margin: 18px 0 24px; }
+    .book-topics span { padding: 8px 12px; border-radius: 999px; background: #eef1f5; color: #253348; font-size: .82rem; font-weight: 600; }
+    .book-meta { color: #4d5a6b; font-size: .9rem; margin: 14px 0 24px; }
+    @media (max-width: 760px) { .book-layout { grid-template-columns: 1fr; } .book-cover-figure { max-width: 390px; } }
+  </style>
+
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -35,6 +48,7 @@
         <a href="#impact">Impact</a>
         <a href="#funding">Funding</a>
         <a href="#publications">Publications</a>
+        <a href="#book">Book</a>
         <a href="#about">About</a>
         <a class="nav-cta" href="#contact">Contact</a>
       </nav>
@@ -102,6 +116,36 @@
         <div class="evidence-item">
           <strong> IEEE/ACM Publications</strong>
           <span>25+ Peer-Reviewed Publications</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PUBLISHED BOOK -->
+    <section class="section section-light" id="book" aria-labelledby="book-heading">
+      <div class="container book-layout">
+        <!-- Add your book cover image as book-cover.jpg in the same folder as index.html. -->
+        <figure class="book-cover-figure reveal">
+          <img class="book-cover-image" src="book-cover.png" alt="Cover of Mathematical Foundations and Engineering of Artificial Intelligence by Dara Ron" loading="lazy" decoding="async" />
+        </figure>
+        <div class="book-copy reveal">
+          <span class="section-kicker">Published Book · 2026</span>
+          <h2 id="book-heading">Mathematical Foundations and Engineering of Artificial Intelligence</h2>
+          <p>
+            A technical textbook bridging the mathematical foundations of artificial intelligence and practical AI engineering. It covers machine learning, deep learning, reinforcement learning, large language models, and modern AI systems, emphasizing the mathematical principles, neural architectures, learning algorithms, optimization methods, and computational processes underlying the development, training, and deployment of AI models.
+          </p>
+          <p>
+            Designed as a resource for students, researchers, and engineers studying and building AI systems.
+          </p>
+          <div class="book-topics" aria-label="Book topics">
+            <span>Mathematical Foundations</span>
+            <span>Optimization</span>
+            <span>Deep Learning</span>
+            <span>Reinforcement Learning</span>
+            <span>Transformers &amp; LLMs</span>
+            <span>AI Engineering</span>
+          </div>
+          <div class="book-meta">Dara Ron · First Edition · 2026 · Amazon Kindle Direct Publishing</div>
+          <a class="button primary" href="https://www.amazon.com/dp/B0HM5C9Q7B" target="_blank" rel="noopener noreferrer" aria-label="View Mathematical Foundations and Engineering of Artificial Intelligence on Amazon">View Book on Amazon ↗</a>
         </div>
       </div>
     </section>
@@ -1350,6 +1394,7 @@
         <a href="#research">Research</a>
         <a href="#systems">Systems</a>
         <a href="#publications">Publications</a>
+        <a href="#book">Book</a>
         <a href="#contact">Contact</a>
       </div>
       <div class="footer-copy">© <span id="current-year"></span> Dara Ron. All rights reserved.</div>
