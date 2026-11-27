@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Dr. Dara Ron — AI-native wireless and space networking research spanning Open RAN, AI-RAN, trustworthy wireless intelligence, and LEO/NTN systems." />
   <meta name="theme-color" content="#CC0000" />
-  <!-- After deploying backend/app.py, set this to e.g. https://your-service.onrender.com/api/chat -->
-  <meta name="wirelessai-api-url" content="https://openriclab-ai-python.onrender.com/api/chat" />
-  <meta name="wirelessai-file-api-url" content="https://openriclab-ai-python.onrender.com/api/chat/file" />
   <title>Dr. Dara Ron | AI-Native FutureG Networks</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,7 +31,6 @@
 
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
         <a href="#research">Research</a>
-         <a href="#wireless-copilot">AI Chat</a>
         <a href="#systems">Projects</a>
         <a href="#impact">Impact</a>
         <a href="#funding">Funding</a>
@@ -207,192 +203,6 @@
       </div>
     </section>
 
-
-<!-- AI Chat -->
-<section class="section copilot-section" id="wireless-copilot">
-
-  <div class="container copilot-container">
-
-    <div class="section-heading heading-wide reveal">
-      <div>
-        <span class="section-kicker">Public AI Assistant</span>
-
-        <h2>
-          AI Chat: a general-purpose AI assistant.
-        </h2>
-      </div>
-
-      <p>
-        A public general-purpose AI assistant for questions across
-        <strong>
-          science, engineering, mathematics, programming,
-          artificial intelligence, writing, research, education,
-          and everyday problem solving
-        </strong>.
-      </p>
-    </div>
-
-
-    <div class="copilot-grid copilot-grid-full">
-
-      <article
-        class="copilot-demo reveal copilot-demo-full"
-        aria-label="AI Chat"
-      >
-
-        <!-- Chat header -->
-        <div class="copilot-window-top">
-
-          <div class="copilot-brand">
-            <span class="copilot-logo">AI</span>
-
-            <div>
-              <strong>AI Chat</strong>
-              <small>General-purpose AI assistant</small>
-            </div>
-          </div>
-
-          <div
-            class="chat-language-selector"
-            aria-label="Select chat language"
-          >
-            <button
-              type="button"
-              class="language-button active"
-              data-language="en"
-              aria-pressed="true"
-            >
-              English
-            </button>
-
-            <button
-              type="button"
-              class="language-button"
-              data-language="km"
-              aria-pressed="false"
-            >
-              ខ្មែរ
-            </button>
-          </div>
-
-          <span class="prototype-badge">
-            Research Prototype
-          </span>
-
-        </div>
-
-        <!-- Chat window -->
-        <div
-          class="chat-preview"
-          id="copilot-chat"
-          aria-live="polite"
-        >
-
-          <div class="chat-row assistant-row">
-
-            <div class="chat-avatar">
-              AI
-            </div>
-
-            <div class="chat-bubble assistant-bubble">
-              <p>
-                <strong>Welcome to AI Chat.</strong>
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- File status / preview -->
-        <div
-          id="copilot-file-preview"
-          class="copilot-file-preview"
-          aria-live="polite"
-          hidden
-        >
-          <div class="copilot-file-preview-main">
-            <span
-              class="copilot-file-icon"
-              aria-hidden="true"
-            >
-              📄
-            </span>
-
-            <div class="copilot-file-meta">
-              <strong id="copilot-file-name"></strong>
-              <small id="copilot-file-size"></small>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            id="copilot-file-remove"
-            class="copilot-file-remove"
-            aria-label="Remove uploaded file"
-            title="Remove file"
-          >
-            ×
-          </button>
-        </div>
-
-        <!-- Chat input -->
-        <form
-          class="copilot-input-row"
-          id="copilot-preview-form"
-          enctype="multipart/form-data"
-        >
-
-          <input
-            id="copilot-file-input"
-            type="file"
-            accept=".pdf,.docx,.xlsx,.xlsm,.xltx,.xltm,.pptx,.ppsx,.potx,.csv,.tsv,.txt,.md,.markdown,.rst,.log,.json,.jsonl,.ndjson,.xml,.yaml,.yml,.toml,.ini,.cfg,.conf,.html,.htm,.css,.scss,.sass,.less,.js,.mjs,.cjs,.jsx,.ts,.tsx,.py,.ipynb,.java,.c,.h,.cpp,.hpp,.cc,.cxx,.cs,.go,.rs,.rb,.php,.swift,.kt,.kts,.scala,.sh,.bash,.zsh,.fish,.ps1,.sql,.r,.m,.tex,.bib,.gradle,.properties,.env,.gitignore"
-            hidden
-          />
-
-          <button
-            type="button"
-            id="copilot-file-button"
-            class="copilot-file-button"
-            aria-label="Upload a document"
-            title="Upload a document"
-          >
-            <span aria-hidden="true">📎</span>
-            <span class="sr-only">Upload a document</span>
-          </button>
-
-          <label
-            class="sr-only"
-            for="copilot-preview-input"
-          >
-            Ask a question
-          </label>
-
-          <input
-            id="copilot-preview-input"
-            type="text"
-            placeholder="Start Chatting..."
-            autocomplete="off"
-          />
-
-          <button
-            type="submit"
-            id="copilot-submit"
-            aria-label="Ask AI Chat"
-          >
-            Ask
-          </button>
-
-        </form>
-
-      </article>
-
-    </div>
-
-  </div>
-
-</section>
 
     <!-- FEATURED SYSTEMS -->
     <section class="section section-light" id="systems">
@@ -1539,17 +1349,12 @@
       <div class="footer-links">
         <a href="#research">Research</a>
         <a href="#systems">Systems</a>
-        <a href="#wireless-copilot">AI Chat</a>
         <a href="#publications">Publications</a>
         <a href="#contact">Contact</a>
       </div>
       <div class="footer-copy">© <span id="current-year"></span> Dara Ron. All rights reserved.</div>
     </div>
   </footer>
-
-
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 
   <script src="script.js"></script>
 </body>
